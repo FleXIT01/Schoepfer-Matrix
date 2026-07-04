@@ -200,6 +200,16 @@ def _eval_case(case: dict, names: list[str], args: str, content: str) -> tuple[b
         notes.append(f"direct {'✓' if hit else '✗ (rief: ' + ', '.join(names) + ')'}")
         checks.append(hit)
 
+    if case.get("expect_no_refusal"):
+        # gpt-oss-Sicherheitsfloskel bei legitimen Aufgaben am eigenen System (AGENTS.md-Grundregel 8)
+        refusal = re.compile(
+            r"can.?t help with that|cannot help with that|can.?t assist|"
+            r"kann (dir )?(dabei|damit)? ?nicht helfen|"
+            r"darf ich nicht|ich kann das nicht unterstützen", re.IGNORECASE)
+        hit = not refusal.search(content)
+        notes.append(f"no_refusal {'✓' if hit else '✗ (Ablehnung: ' + content[:60] + ')'}")
+        checks.append(hit)
+
     if "expect_judge" in case:
         hit, reason = _judge(case["expect_judge"], case.get("prompt", ""), content)
         notes.append(f"judge {'✓' if hit else '✗'} ({reason})")

@@ -1,5 +1,5 @@
 {
-  "saved": "20260704-172333",
+  "saved": "20260704-222737",
   "model": "gpt-oss-32k",
   "cases": {
     "g01-route-code": {
@@ -125,7 +125,7 @@
     "g21-profile": {
       "status": "pass",
       "tools": [
-        "profile__profile_get"
+        "profile__profile_list"
       ]
     },
     "g22-research-pdf-send": {
@@ -157,6 +157,12 @@
     "g27-judge-explain": {
       "status": "pass",
       "tools": []
+    },
+    "g28-eigenes-netz-kein-refusal": {
+      "status": "pass",
+      "tools": [
+        "assistant__run_command"
+      ]
     }
   }
 }
