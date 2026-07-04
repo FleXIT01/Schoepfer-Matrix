@@ -421,11 +421,62 @@ def cloud_code(task: str, language: str = "python") -> str:
     return _openrouter_chat(_CLOUD_CODE_MODEL, messages, purpose="cloud_code")
 
 
+def _system_snapshot() -> str:
+    """Kompakter Live-Systemzustand fuer den Council (~8 Zeilen, best effort).
+    CPU/RAM, GPU/VRAM, geladene Ollama-Modelle, letzte Trace-Schritte — damit der
+    Rat Ressourcen-Engpaesse SIEHT statt sie zu raten."""
+    lines: list[str] = []
+    try:
+        import psutil
+        cpu = psutil.cpu_percent(interval=0.3)
+        vm = psutil.virtual_memory()
+        lines.append(f"CPU {cpu:.0f}% | RAM {vm.used/2**30:.1f}/{vm.total/2**30:.0f} GB ({vm.percent:.0f}%)")
+    except Exception:
+        pass
+    try:
+        import subprocess
+        out = subprocess.run(
+            ["nvidia-smi", "--query-gpu=utilization.gpu,memory.used,memory.total",
+             "--format=csv,noheader,nounits"],
+            capture_output=True, text=True, timeout=5).stdout.strip().splitlines()
+        for i, row in enumerate(out):
+            u, mu, mt = [x.strip() for x in row.split(",")]
+            lines.append(f"GPU{i} {u}% | VRAM {float(mu)/1024:.1f}/{float(mt)/1024:.1f} GB")
+    except Exception:
+        pass
+    try:
+        import httpx
+        r = httpx.get(f"{_OLLAMA}/api/ps", timeout=5)
+        models = r.json().get("models", [])
+        if models:
+            lines.append("Ollama geladen: " + ", ".join(
+                f"{m.get('name','?')} ({m.get('size_vram',0)/2**30:.1f} GB VRAM)" for m in models))
+        else:
+            lines.append("Ollama geladen: (kein Modell)")
+    except Exception:
+        pass
+    try:
+        trace_db = Path(__file__).parent.parent / "trace_mcp" / "trace.db"
+        if trace_db.exists():
+            with sqlite3.connect(trace_db, timeout=2.0) as c:
+                rows = c.execute(
+                    "SELECT step, latency_ms, status FROM steps ORDER BY id DESC LIMIT 4"
+                ).fetchall()
+            if rows:
+                lines.append("Letzte Schritte: " + "; ".join(
+                    f"{s} {ms}ms{'' if st == 'ok' else ' [' + st + ']'}" for s, ms, st in rows))
+    except Exception:
+        pass
+    return "\n".join(lines)
+
+
 @mcp.tool()
 def council(prompt: str, judge: str = "local") -> str:
     """Rat der Modelle: lokal (gpt-oss:20b) + cloud_cheap (DeepSeek) antworten UNABHAENGIG;
     ein Richter fasst zusammen und markiert Widersprueche EXPLIZIT als Liste.
     Killt Single-Model-Blindspots bei wichtigen Entscheidungen.
+    Beide Raete + Richter sehen einen Live-Systemzustand (CPU/GPU/VRAM/geladene Modelle) —
+    Empfehlungen zu Batch-Groessen, Modellwahl oder Performance beruhen auf ECHTEN Zahlen.
     Kosten: 1 DeepSeek-Call (Centbereich) + optionaler Richter-Cloud-Call.
     `prompt` = die Frage/Aufgabe.
     `judge`  = 'local' (gpt-oss, Default) | 'cloud' (Claude Opus, teurer, fuer kritische Entscheidungen).
@@ -433,6 +484,11 @@ def council(prompt: str, judge: str = "local") -> str:
     import concurrent.futures
 
     local_model = _MODEL_MAP["reasoning"][0]  # gpt-oss:20b
+
+    snapshot = _system_snapshot()
+    if snapshot:
+        prompt = (f"{prompt}\n\n[SYSTEMZUSTAND JETZT — nur nutzen, wenn fuer die Frage "
+                  f"relevant (Ressourcen/Performance/Modellwahl):\n{snapshot}]")
 
     local_msgs = [
         {"role": "system", "content":

@@ -90,7 +90,9 @@ echo [2/6] Python-Pakete installieren ...
 echo   [ok] pip-Pakete installiert.
 REM Antivirus-HTTPS-Inspektion (Avast & Co.): truststore laesst Python die
 REM WINDOWS-Zertifikatpruefung nutzen, sonst scheitern alle HTTPS-Calls.
-%PYTHON_EXE% -c "import site, pathlib; sc = pathlib.Path(site.getusersitepackages()) / 'sitecustomize.py'; sc.parent.mkdir(parents=True, exist_ok=True); sc.exists() or sc.write_text('try:\n    import truststore\n    truststore.inject_into_ssl()\nexcept Exception:\n    pass\n', encoding='utf-8'); print('  [ok] sitecustomize:', sc)"
+REM Lazy-Variante aus dem Repo (pip>=25 injiziert selbst -> RecursionError);
+REM ersetzt auch die alte Direkt-Inject-Version, fremde Dateien bleiben unangetastet.
+%PYTHON_EXE% -c "import site, pathlib, shutil; src = pathlib.Path(r'%MATRIX_ROOT%') / 'sitecustomize.py'; sc = pathlib.Path(site.getusersitepackages()) / 'sitecustomize.py'; sc.parent.mkdir(parents=True, exist_ok=True); cur = sc.read_text(encoding='utf-8') if sc.exists() else ''; (not cur or ('inject_into_ssl' in cur and 'LazyTruststore' not in cur)) and shutil.copyfile(src, sc); print('  [ok] sitecustomize:', sc)"
 echo.
 
 REM ---------- 3) KONFIG-DATEIEN AUS VORLAGEN ----------

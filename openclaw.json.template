@@ -298,6 +298,11 @@
     },
     "port": 18789,
     "bind": "lan",
+    "http": {
+      "endpoints": {
+        "chatCompletions": { "enabled": true }
+      }
+    },
     "tailscale": {
       "mode": "off",
       "resetOnExit": false

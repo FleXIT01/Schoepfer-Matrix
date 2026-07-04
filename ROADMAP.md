@@ -13,6 +13,15 @@ was geplant ist und was **bewusst nicht** gemacht wird (mit Begründung).
 | Skill RAG-Pflege | `skills/rag-optimize` — nutzt vorhandene `kb_dedup`/`kb_resolve_conflicts`/`kb_stats` + Stichproben-Qualitätstest |
 | Skill API-Integration | `skills/api-integrate` — Doku lesen → MCP-Server aus `mcp-servers/_template_mcp/` generieren → lokal testen → **GO-Gate** → registrieren. Nie ohne Freigabe. |
 
+## ✅ Umgesetzt (Runde 2, Juli 2026)
+
+| Vorschlag | Umsetzung |
+|---|---|
+| Interaktive Telegram-Freigabe | **Ein-Tipp-Buttons** bei jedem PENDING-Gate (mail + gate_middleware). Bewusst **Reply-Keyboard statt Inline-Buttons**: der Tap sendet `GO <id>` als normale Nachricht durch den Gateway-Fluss. Ein separater Callback-Poller (`tg_callback_poll.py`) ist technisch unmöglich — Telegram erlaubt nur EINEN getUpdates-Konsumenten, und den belegt das Gateway (zweiter Poller → HTTP 409). |
+| Voice-Gateway (freihändig) | `voice.cmd` / `voice_ptt.py`: F8 halten → faster-whisper (lokal, ~1 s) → Gateway-`/v1/chat/completions` (gleicher Agent, alle Tools, eigene Session) → Piper-TTS-Antwort. Endpoint in der Gateway-Config aktiviert. |
+| Live-System-Streaming für llm.council | `_system_snapshot()` (CPU/RAM, GPU/VRAM via nvidia-smi, geladene Ollama-Modelle, letzte Trace-Schritte) wird beiden Räten + Richter mitgegeben — Ressourcen-Empfehlungen beruhen auf echten Zahlen. |
+| ui-audit (visueller Guardrail) | Skill `ui-audit`: nach Desktop-Aktionen (Klick, Programmstart, ComfyUI) per `screenshot.vision_pipeline` + gezielter Ja/Nein-Frage prüfen statt blind Erfolg zu melden; max. 2 Korrekturversuche, dann Stopp + Befund. |
+
 ## 🟡 Teilweise vorhanden (kein Neubau nötig)
 
 - **Critic-Reflection-Loop / Multi-Agent-Debate:** existiert als `llm.council`

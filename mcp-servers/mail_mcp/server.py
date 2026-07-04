@@ -82,7 +82,10 @@ _init_db()
 
 
 def _tg_send_approval_buttons(pid: str, description: str) -> None:
-    """G1: Sendet Telegram-Nachricht mit GO/NO Inline-Buttons für PENDING-Aktionen."""
+    """G1: Freigabe per Ein-Tipp-Button. Reply-Keyboard statt Inline-Buttons:
+    der Tap sendet den Button-Text ("GO <id>") als normale Nutzer-Nachricht durch
+    den Gateway-Fluss. (Inline-callback_data braeuchte einen eigenen getUpdates-
+    Konsumenten — den belegt bereits das Gateway, ein zweiter Poller -> HTTP 409.)"""
     token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
     chat = os.environ.get("TELEGRAM_DEFAULT_CHAT_ID", "").strip()
     if not token or not chat:
@@ -91,12 +94,15 @@ def _tg_send_approval_buttons(pid: str, description: str) -> None:
         import httpx as _hx
         payload = {
             "chat_id": chat,
-            "text": f"⏳ PENDING {pid}\n{description}\n\nAktion bestätigen?",
+            "text": f"⏳ PENDING {pid}\n{description}\n\nAntippen zum Bestätigen oder Abbrechen:",
             "reply_markup": {
-                "inline_keyboard": [[
-                    {"text": "✅ GO", "callback_data": f"confirm_{pid}"},
-                    {"text": "❌ NO", "callback_data": f"cancel_{pid}"},
-                ]]
+                "keyboard": [[
+                    {"text": f"GO {pid}"},
+                    {"text": f"NEIN {pid}"},
+                ]],
+                "resize_keyboard": True,
+                "one_time_keyboard": True,
+                "input_field_placeholder": f"GO {pid} oder NEIN {pid}",
             },
         }
         _hx.post(

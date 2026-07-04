@@ -23,13 +23,15 @@ Alle Aktionen werden in audit.log protokolliert (V8).
 """
 from __future__ import annotations
 
+import os
 import secrets
 import sqlite3
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-_DB = Path(r"n:\allinall\openclaw-workspace\state\pending_gates.db")
+_ROOT = Path(os.environ.get("MATRIX_ROOT", str(Path(__file__).parent.parent)))
+_DB = _ROOT / "openclaw-workspace" / "state" / "pending_gates.db"
 _EXPIRE_MINUTES = 30
 _MCP_ROOT = Path(__file__).parent
 
@@ -62,6 +64,53 @@ def _audit(tool: str, summary: str, outcome: str) -> None:
         pass
 
 
+def _totp_ready() -> bool:
+    sys.path.insert(0, str(_MCP_ROOT))
+    try:
+        from totp import is_ready
+        return bool(is_ready())
+    except ImportError:
+        return False
+
+
+def _tg_notify_gate(gid: str, tool: str, preview: str, sharp: bool) -> None:
+    """G1: Freigabe per Ein-Tipp-Button aufs Handy. Reply-Keyboard: der Tap sendet
+    den Button-Text ("GO <id>") als normale Nutzer-Nachricht durch den Gateway-Fluss
+    (kein zweiter getUpdates-Poller moeglich — das Gateway belegt den Kanal).
+    Scharfe Gates mit TOTP bekommen KEINEN GO-Button: der Code muss angehaengt werden."""
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    chat = os.environ.get("TELEGRAM_DEFAULT_CHAT_ID", "").strip()
+    if not token or not chat:
+        return
+    try:
+        import httpx as _hx
+        needs_totp = sharp and _totp_ready()
+        if needs_totp:
+            text = (f"🔒 PENDING {gid} [SCHARF]\nTool: {tool}\n{preview[:400]}\n\n"
+                    f"Freigabe nur mit 2FA: 'GO {gid} <TOTP-Code>' senden — "
+                    f"oder unten abbrechen.")
+            keyboard = [[{"text": f"NEIN {gid}"}]]
+        else:
+            text = (f"⏳ PENDING {gid}\nTool: {tool}\n{preview[:400]}\n\n"
+                    f"Antippen zum Bestätigen oder Abbrechen:")
+            keyboard = [[{"text": f"GO {gid}"}, {"text": f"NEIN {gid}"}]]
+        _hx.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={
+                "chat_id": chat,
+                "text": text,
+                "reply_markup": {
+                    "keyboard": keyboard,
+                    "resize_keyboard": True,
+                    "one_time_keyboard": True,
+                },
+            },
+            timeout=10,
+        )
+    except Exception:
+        pass  # Benachrichtigung ist optional — nie den Hauptfluss blockieren
+
+
 def gate_hold(tool: str, preview: str, sharp: bool = False) -> str:
     """Legt einen Pending-Eintrag an und gibt die 6-stellige Gate-ID zurueck."""
     _init()
@@ -75,6 +124,7 @@ def gate_hold(tool: str, preview: str, sharp: bool = False) -> str:
             (gid, tool, preview, now.isoformat(), expires.isoformat(), 1 if sharp else 0),
         )
     _audit(tool, preview[:300], "PENDING+TOTP" if sharp else "PENDING")
+    _tg_notify_gate(gid, tool, preview, sharp)
     return gid
 
 

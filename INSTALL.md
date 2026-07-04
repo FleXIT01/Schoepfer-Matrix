@@ -51,6 +51,16 @@ nachgeholt).
 | Sofort-Backup | `/backup` im Telegram-Chat oder Task 02:30 |
 | Autostart beim PC-Boot an/aus | `autostart.cmd on` / `off` |
 | Eval-Suite manuell | `run_eval.cmd` (nachts automatisch) |
+| Sprachsteuerung (Push-to-Talk) | `voice.cmd` — F8 halten und sprechen (Gateway muss laufen) |
+
+### Optional: Sprachsteuerung (Voice-PTT)
+
+Python-Pakete kommen über `requirements.txt` mit. Zusätzlich nötig für
+gesprochene Antworten: [Piper](https://github.com/rhasspy/piper/releases)
+nach `piper\` entpacken + deutsche Stimme `de_DE-thorsten-medium.onnx` (+ `.json`)
+von [HuggingFace](https://huggingface.co/rhasspy/piper-voices/tree/main/de/de_DE/thorsten/medium)
+ins gleiche Verzeichnis. Ohne Piper kommt die Antwort nur als Text im Fenster.
+Taste/Modell konfigurierbar in `matrix.env` (`VOICE_PTT_KEY`, `WHISPER_MODEL`).
 
 ## Pfad-/Konfig-Prinzip
 

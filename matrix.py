@@ -72,6 +72,14 @@ def cmd_retro(_: argparse.Namespace) -> int:
     return _cmd_script("retro.cmd")
 
 
+def cmd_voice(_: argparse.Namespace) -> int:
+    # Eigenes Fenster: Push-to-Talk läuft dauerhaft und braucht die Konsole.
+    subprocess.Popen(["cmd", "/c", "start", "Matrix Voice-PTT",
+                      str(ROOT / "voice.cmd")], cwd=str(ROOT))
+    print("[matrix] Voice-PTT gestartet — Taste F8 halten und sprechen (Gateway muss laufen).")
+    return 0
+
+
 def cmd_budget(_: argparse.Namespace) -> int:
     return _run([sys.executable, str(ROOT / "eval" / "tool_budget.py")])
 
@@ -109,6 +117,7 @@ def main() -> None:
     sub.add_parser("backup", help="Sofort-Backup").set_defaults(fn=cmd_backup)
     sub.add_parser("briefing", help="Morgenbriefing jetzt senden").set_defaults(fn=cmd_briefing)
     sub.add_parser("retro", help="Wochen-Retro jetzt ausführen").set_defaults(fn=cmd_retro)
+    sub.add_parser("voice", help="Sprachsteuerung (Push-to-Talk, F8)").set_defaults(fn=cmd_voice)
     sub.add_parser("budget", help="Tool-Kontextbudget messen").set_defaults(fn=cmd_budget)
     sub.add_parser("logs", help="wichtigste Logs anzeigen").set_defaults(fn=cmd_logs)
 

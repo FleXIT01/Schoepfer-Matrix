@@ -21,7 +21,7 @@ OpenRouter) sind optionaler Fallback mit hartem Tagesbudget.
 | 🔬 **Wissenschaft** | PubMed, arXiv, ChEMBL, AlphaFold, RCSB PDB, OpenAlex, EuropePMC … (11 Science-Tools) |
 | 📄 **Dokumente** | PDF erstellen, Word/Excel/PowerPoint lesen + schreiben |
 | 🎨 **Bilder** | ComfyUI-Bildgenerierung direkt aus dem Chat |
-| 🗣️ **Sprache** | Sprachnachrichten verstehen (Whisper) und antworten (Piper) — inkl. „mach mir einen Podcast über …" |
+| 🗣️ **Sprache** | Sprachnachrichten verstehen (Whisper) und antworten (Piper) — inkl. „mach mir einen Podcast über …"; **freihändige PC-Sprachsteuerung** per Push-to-Talk (`voice.cmd`, F8 halten) |
 | 🔁 **Automatisierung** | n8n-Webhooks, Job-Queue für Langläufer, GitHub-Workflow (Issue → Branch → PR, mit Freigabe) |
 | 💾 **Betrieb** | `/backup` per Chat, tägliche Backups, Morgenbriefing (arXiv-Watchlist + Systemstatus), Wochen-Retro mit Verbesserungsvorschlägen |
 
@@ -29,6 +29,7 @@ OpenRouter) sind optionaler Fallback mit hartem Tagesbudget.
 
 - **Freigabe-Gates:** E-Mail-Versand, PRs, Browser-Eingaben brauchen ein explizites
   `GO <id>` im Chat — kritische Aktionen zusätzlich **TOTP** (Authenticator-App).
+  Bei jeder offenen Freigabe kommen **Ein-Tipp-Buttons** aufs Handy (GO/NEIN).
 - **Kostenbremse:** Cloud-Calls haben ein Tageslimit (Standard 2 €) + Stundenlimit;
   bei Überschreitung wird geblockt statt gebucht.
 - **Injektions-Quarantäne:** Inhalte aus Web/Mail/PDF sind *Daten*, niemals Befehle.
@@ -53,7 +54,8 @@ OpenRouter) sind optionaler Fallback mit hartem Tagesbudget.
 ## Architektur
 
 ```
-Telegram ──► OpenClaw-Gateway (Node, Port 18789)
+Telegram ──────────────┐
+Voice-PTT (F8, lokal) ──┴──► OpenClaw-Gateway (Node, Port 18789)
                 │  System-Prompt: AGENTS.md (Werkzeug-Routing)
                 ▼
          gpt-oss-32k @ Ollama (lokal, 49k Kontext, Flash-Attention, q8-KV)
@@ -95,10 +97,11 @@ Alle Skripte sind **portabel**: kein Pfad ist hartkodiert, der Repo-Ordner darf
 | Gesamtstatus (Dienste, VRAM, Tasks, Backup-Alter, Eval) | `status.cmd` / `matrix.py status` |
 | Autostart beim PC-Boot an/aus | `autostart.cmd on` / `off` |
 | Sofort-Backup | `/backup` im Chat oder `matrix.py backup` |
+| Sprachsteuerung (freihändig) | `voice.cmd` oder `matrix.py voice` — F8 halten, sprechen, loslassen |
 | Eval-Suite gegen Baseline | `run_eval.cmd` / `matrix.py eval` |
 | Logs / Tool-Kontextbudget | `matrix.py logs` · `matrix.py budget` |
 
-`matrix.py` ist das zentrale CLI (`up/stop/status/eval/backup/briefing/retro/budget/logs`)
+`matrix.py` ist das zentrale CLI (`up/stop/status/eval/backup/briefing/retro/voice/budget/logs`)
 — es delegiert an die getesteten Skripte. Architektur-Entscheidungen und geplante
 Erweiterungen: **[ROADMAP.md](ROADMAP.md)**.
 
@@ -112,10 +115,11 @@ Erweiterungen: **[ROADMAP.md](ROADMAP.md)**.
 ├─ status.cmd / health.ps1          Gesamtstatus auf einen Blick
 ├─ watchdog.cmd / backup.cmd        Betrieb: Heilung, Backups, Alarme
 ├─ briefing.py / retro.py / mail_poll.py   Morgenbriefing, Wochen-Retro, Mail-Eingang
+├─ voice.cmd / voice_ptt.py         Freihändige Sprachsteuerung (Push-to-Talk)
 ├─ mcp-servers/                     24 MCP-Server (Python, FastMCP)
 ├─ eval/                            Golden-Suite, Tool-Budget, Profile, Kataloge
 ├─ matrix.py                        zentrales CLI (up/stop/status/eval/…)
-├─ openclaw-workspace/agent-workspace/   AGENTS.md (Werkzeug-Routing) + 21 Skills
+├─ openclaw-workspace/agent-workspace/   AGENTS.md (Werkzeug-Routing) + 22 Skills
 └─ openclaw-main/                   OpenClaw (separat installieren, nicht im Repo)
 ```
 
