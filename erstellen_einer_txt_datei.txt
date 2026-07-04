@@ -1,0 +1,1 @@
+Eine TXT-Datei besteht aus unformatiertem ASCII-Text und kann in jedem Textverarbeitungsprogramm und vielen anderen Anwendungen geöffnet sowie bearbeitet werden. Eine TXT-Datei können Sie mit jedem gängigen Texteditor oder Schreibprogramm erstellen. Speichern Sie das Dokument als Textdokument mit der Endung ".txt".

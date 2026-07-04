@@ -1,0 +1,35 @@
+# Block 3 — Prompt-Paket: {{ spec.name }}
+
+> Generiert am {{ spec.generated_at }}
+
+---
+
+## System-Prompt
+
+```
+{{ spec.system_prompt }}
+```
+
+---
+
+## Entwickler-Hinweise
+
+{{ spec.developer_notes }}
+
+---
+
+## Beispiel-Konversationen
+
+{% if spec.example_conversations %}
+{% for example in spec.example_conversations %}
+### Szenario {{ loop.index }}: {{ example.description }}
+
+{% for turn in example.turns %}
+**{{ "Nutzer" if turn.role == "user" else "Bot" }}:** {{ turn.content }}
+
+{% endfor %}
+---
+{% endfor %}
+{% else %}
+> **TODO:** Keine Beispiel-Konversationen generiert. Manuell ergänzen.
+{% endif %}

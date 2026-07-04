@@ -1,0 +1,27 @@
+# SCHÖPFER-MATRIX — TOOL-PROFILE (V14, Kontextbudget)
+# Jedes Profil erlaubt nur bestimmte MCP-Server; alle übrigen aktiven Tools werden
+# zur tools.deny-Liste hinzugefügt. Weniger Server = weniger Tool-Schemas pro Turn
+# = schnellere/billigere Turns + mehr Platz für echten Inhalt.
+#
+# Umschalten:  python tool_profile.py apply <name>
+# Anzeigen:    python tool_profile.py show
+#
+# Faustregel: lokal mit 32k-Kontext -> 'core' reicht für 90% des Alltags.
+# 'full' nur, wenn Browser/Wiki/Spezial-Tools wirklich gebraucht werden.
+
+profiles:
+  minimal:
+    desc: "Nur Chat + Compute + Status (schnellster Turn, für triviale/Reasoning-Tasks)"
+    servers: [llm, status, trace, planner, assistant]
+
+  core:
+    desc: "Alltags-Assistent: Wissen, Recherche, Dokumente, Kommunikation, PC-Steuerung"
+    servers: [llm, status, trace, planner, assistant, kb, research, pdf, mail, screenshot, profile]
+
+  research:
+    desc: "core + Browser + Wiki (echtes Web-Surfen / Build-in-Public)"
+    servers: [llm, status, trace, planner, assistant, kb, research, pdf, mail, screenshot, profile, browser, wiki]
+
+  full:
+    desc: "Alle aktiven Server (aktueller Default) — maximale Fähigkeit, höchste Kontextkosten"
+    servers: [llm, status, trace, planner, assistant, kb, research, pdf, mail, screenshot, profile, browser, wiki, factory, review]

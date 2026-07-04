@@ -1,0 +1,54 @@
+{
+  "mcpServers": {
+    "science": {
+      "command": "C:\\Python314\\python.exe",
+      "args": ["n:\\allinall\\mcp-servers\\science_mcp\\server.py"],
+      "description": "11 Bio-Wissenschafts-APIs (arXiv, PubMed, ChEMBL, AlphaFold, PDB, STRING, Ensembl, Reactome, openFDA, OpenAlex, EuropePMC)"
+    },
+    "factory": {
+      "command": "C:\\Python314\\python.exe",
+      "args": ["n:\\allinall\\mcp-servers\\factory_mcp\\server.py"],
+      "description": "Bot-Fabrik aus bot1: build_bot/verify_package/list_capabilities (Sandbox-verifiziert, braucht Ollama)"
+    },
+    "review": {
+      "command": "C:\\Python314\\python.exe",
+      "args": ["n:\\allinall\\mcp-servers\\review_mcp\\server.py"],
+      "description": "Code-Review (Static Analysis): review_code/review_file/scan_repo"
+    },
+    "planner": {
+      "command": "C:\\Python314\\python.exe",
+      "args": ["n:\\allinall\\mcp-servers\\planner_mcp\\server.py"],
+      "description": "Hardware-Berater: get_resources/can_load/recommend (RAM/VRAM/GPU)"
+    },
+    "knowledge": {
+      "command": "C:\\Python314\\python.exe",
+      "args": ["n:\\allinall\\mcp-servers\\knowledge_mcp\\server.py"],
+      "description": "Lokaler Lern-Korpus (RAG): knowledge_search/knowledge_stats. Vorher ingest.py ausführen."
+    },
+    "status": {
+      "command": "C:\\Python314\\python.exe",
+      "args": ["n:\\allinall\\mcp-servers\\status_mcp\\server.py"],
+      "description": "System-Ampel: system_status() zeigt Ollama/Gateway/WeKnora/VRAM/Disk/Budget auf einen Blick."
+    },
+    "voice": {
+      "command": "C:\\Python314\\python.exe",
+      "args": ["n:\\allinall\\mcp-servers\\voice_mcp\\server.py"],
+      "description": "Voice-Loop (N2): transcribe(audio_file) → Text via faster-whisper; speak(text) → WAV via Piper TTS. Lokal, kein Cloud-Key."
+    },
+    "hook": {
+      "command": "C:\\Python314\\python.exe",
+      "args": ["n:\\allinall\\mcp-servers\\hook_mcp\\server.py"],
+      "description": "Webhook/n8n-Trigger (N4): n8n_trigger(webhook_url, payload_json) + webhook_call(url, method, payload_json, headers_json) — sendet HTTP-Requests an externe Webhooks."
+    },
+    "office": {
+      "command": "C:\\Python314\\python.exe",
+      "args": ["n:\\allinall\\mcp-servers\\office_mcp\\server.py"],
+      "description": "Office-Dokumente (N6): create_docx/read_docx (Word), create_pptx/read_pptx (PowerPoint), create_xlsx/read_xlsx (Excel). Braucht: pip install python-docx python-pptx openpyxl"
+    },
+    "browser": {
+      "command": "C:\\Python314\\python.exe",
+      "args": ["n:\\allinall\\mcp-servers\\browser_mcp\\server.py"],
+      "description": "Kontrollierter Chromium-Browser (Phase C): browser_open/browser_navigate/browser_screenshot/browser_dom_tree/browser_get_text lesen (ungated); browser_click (GO) / browser_type / browser_submit (GO+TOTP). Domain-Allowlist. Playwright laeuft auf dediziertem Worker-Thread."
+    }
+  }
+}

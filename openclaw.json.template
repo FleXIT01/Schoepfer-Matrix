@@ -1,0 +1,541 @@
+{
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw",
+    "ownerAllowFrom": [
+      "telegram:{{TELEGRAM_DEFAULT_CHAT_ID}}"
+    ]
+  },
+  "mcp": {
+    "servers": {
+      "science": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/science_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8"
+        }
+      },
+      "factory": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/factory_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8"
+        }
+      },
+      "review": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/review_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8"
+        }
+      },
+      "planner": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/planner_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8"
+        }
+      },
+      "knowledge": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/knowledge_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8"
+        }
+      },
+      "llm": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/llm_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8",
+          "OPENROUTER_API_KEY": "{{OPENROUTER_API_KEY}}",
+          "OPENROUTER_MODEL": "anthropic/claude-opus-4.8",
+          "OPENROUTER_CODE_MODEL": "anthropic/claude-sonnet-4.6",
+          "DEEPSEEK_MODEL": "deepseek/deepseek-v3.2"
+        }
+      },
+      "research": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/research_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8"
+        }
+      },
+      "pdf": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/pdf_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8"
+        }
+      },
+      "wiki": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/wiki_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8"
+        }
+      },
+      "molviz": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/molviz_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8"
+        }
+      },
+      "kb": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/kb_mcp/server.py"
+        ],
+        "env": {
+          "WEKNORA_BASE_URL": "{{WEKNORA_BASE_URL}}",
+          "WEKNORA_API_KEY": "{{WEKNORA_API_KEY}}",
+          "WEKNORA_KB_ID": "{{WEKNORA_KB_ID}}",
+          "PYTHONIOENCODING": "utf-8"
+        }
+      },
+      "mail": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/mail_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8",
+          "SMTP_HOST": "smtp-mail.outlook.com",
+          "SMTP_PORT": "587",
+          "SMTP_STARTTLS": "1",
+          "TELEGRAM_BOT_TOKEN": "{{TELEGRAM_BOT_TOKEN}}",
+          "TELEGRAM_DEFAULT_CHAT_ID": "{{TELEGRAM_DEFAULT_CHAT_ID}}"
+        }
+      },
+      "assistant": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/assistant_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8",
+          "TELEGRAM_BOT_TOKEN": "{{TELEGRAM_BOT_TOKEN}}",
+          "TELEGRAM_DEFAULT_CHAT_ID": "{{TELEGRAM_DEFAULT_CHAT_ID}}"
+        }
+      },
+      "trace": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/trace_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8"
+        }
+      },
+      "status": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/status_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8"
+        }
+      },
+      "voice": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/voice_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8",
+          "PIPER_DIR": "n:/allinall/piper",
+          "WHISPER_MODEL": "small",
+          "WHISPER_DEVICE": "cpu"
+        }
+      },
+      "hook": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/hook_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8"
+        }
+      },
+      "office": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/office_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8",
+          "OFFICE_OUTPUT_DIR": "n:/allinall/openclaw-workspace/output"
+        }
+      },
+      "quiz": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/quiz_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8",
+          "WEKNORA_BASE_URL": "{{WEKNORA_BASE_URL}}",
+          "WEKNORA_API_KEY": "{{WEKNORA_API_KEY}}",
+          "WEKNORA_KB_ID": "{{WEKNORA_KB_ID}}",
+          "QUIZ_DB_PATH": "n:/allinall/openclaw-workspace/state/quiz.db",
+          "QUIZ_MODEL": "gpt-oss-32k"
+        }
+      },
+      "github": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/github_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8",
+          "GITHUB_TOKEN": "{{GITHUB_TOKEN}}",
+          "GITHUB_CLONE_ROOT": "n:/allinall/repos"
+        }
+      },
+      "jobs": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/jobs_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8",
+          "TELEGRAM_BOT_TOKEN": "{{TELEGRAM_BOT_TOKEN}}",
+          "TELEGRAM_DEFAULT_CHAT_ID": "{{TELEGRAM_DEFAULT_CHAT_ID}}"
+        }
+      },
+      "profile": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/profile_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8"
+        }
+      },
+      "screenshot": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/screenshot_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8",
+          "SCREENSHOT_DIR": "n:/allinall/openclaw-workspace/output/screenshots"
+        }
+      },
+      "browser": {
+        "command": "C:/Python314/python.exe",
+        "args": [
+          "n:/allinall/mcp-servers/browser_mcp/server.py"
+        ],
+        "env": {
+          "PYTHONIOENCODING": "utf-8",
+          "BROWSER_PROFILE_DIR": "n:/allinall/openclaw-workspace/browser-profile",
+          "BROWSER_SESSION_LOG_DIR": "n:/allinall/openclaw-workspace/output/browser-sessions"
+        }
+      }
+    }
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "agents": {
+    "defaults": {
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 4,
+        "archiveAfterMinutes": 60,
+        "model": {
+          "primary": "openrouter/anthropic/claude-sonnet-4.6"
+        }
+      },
+      "workspace": "n:\\allinall\\openclaw-workspace\\agent-workspace",
+      "model": "ollama/gpt-oss-32k",
+      "compaction": {
+        "reserveTokens": 6144,
+        "reserveTokensFloor": 6144
+      },
+      "thinkingDefault": "off",
+      "memorySearch": {
+        "enabled": false
+      }
+    }
+  },
+  "cron": {
+    "maxConcurrentRuns": 8
+  },
+  "meta": {
+    "lastTouchedVersion": "2026.6.2",
+    "lastTouchedAt": "2026-06-16T19:21:15.174Z"
+  },
+  "gateway": {
+    "mode": "local",
+    "auth": {
+      "mode": "token",
+      "token": "{{OPENCLAW_GATEWAY_TOKEN}}"
+    },
+    "port": 18789,
+    "bind": "lan",
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    }
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "tools": {
+    "profile": "coding",
+    "alsoAllow": [
+      "message",
+      "heartbeat_respond"
+    ],
+    "deny": []
+  },
+  "skills": {
+    "install": {
+      "nodeManager": "npm"
+    },
+    "entries": {
+      "knowledge-ask": {
+        "enabled": true
+      },
+      "1password": {
+        "enabled": false
+      },
+      "apple-notes": {
+        "enabled": false
+      },
+      "apple-reminders": {
+        "enabled": false
+      },
+      "bear-notes": {
+        "enabled": false
+      },
+      "blogwatcher": {
+        "enabled": false
+      },
+      "blucli": {
+        "enabled": false
+      },
+      "camsnap": {
+        "enabled": false
+      },
+      "clawhub": {
+        "enabled": false
+      },
+      "coding-agent": {
+        "enabled": false
+      },
+      "discord": {
+        "enabled": false
+      },
+      "eightctl": {
+        "enabled": false
+      },
+      "gh-issues": {
+        "enabled": false
+      },
+      "gifgrep": {
+        "enabled": false
+      },
+      "github": {
+        "enabled": false
+      },
+      "gog": {
+        "enabled": false
+      },
+      "goplaces": {
+        "enabled": false
+      },
+      "himalaya": {
+        "enabled": false
+      },
+      "imsg": {
+        "enabled": false
+      },
+      "mcporter": {
+        "enabled": false
+      },
+      "model-usage": {
+        "enabled": false
+      },
+      "nano-pdf": {
+        "enabled": false
+      },
+      "obsidian": {
+        "enabled": false
+      },
+      "openai-whisper": {
+        "enabled": false
+      },
+      "openai-whisper-api": {
+        "enabled": false
+      },
+      "openhue": {
+        "enabled": false
+      },
+      "oracle": {
+        "enabled": false
+      },
+      "ordercli": {
+        "enabled": false
+      },
+      "peekaboo": {
+        "enabled": false
+      },
+      "qqbot-channel": {
+        "enabled": false
+      },
+      "qqbot-media": {
+        "enabled": false
+      },
+      "qqbot-remind": {
+        "enabled": false
+      },
+      "sag": {
+        "enabled": false
+      },
+      "session-logs": {
+        "enabled": false
+      },
+      "sherpa-onnx-tts": {
+        "enabled": false
+      },
+      "slack": {
+        "enabled": false
+      },
+      "songsee": {
+        "enabled": false
+      },
+      "sonoscli": {
+        "enabled": false
+      },
+      "spotify-player": {
+        "enabled": false
+      },
+      "summarize": {
+        "enabled": false
+      },
+      "things-mac": {
+        "enabled": false
+      },
+      "tmux": {
+        "enabled": false
+      },
+      "trello": {
+        "enabled": false
+      },
+      "voice-call": {
+        "enabled": false
+      },
+      "wacli": {
+        "enabled": false
+      },
+      "xurl": {
+        "enabled": false
+      }
+    }
+  },
+  "wizard": {
+    "lastRunAt": "2026-06-12T17:47:40.394Z",
+    "lastRunVersion": "2026.6.2",
+    "lastRunCommand": "doctor",
+    "lastRunMode": "local"
+  },
+  "models": {
+    "providers": {
+      "ollama": {
+        "baseUrl": "http://localhost:11434",
+        "contextTokens": 49152,
+        "contextWindow": 49152,
+        "maxTokens": 4096
+      },
+      "comfy": {
+        "baseUrl": "http://127.0.0.1:8188"
+      },
+      "openrouter": {
+        "apiKey": "{{OPENROUTER_API_KEY}}"
+      }
+    }
+  },
+  "channels": {
+    "telegram": {
+      "botToken": "{{TELEGRAM_BOT_TOKEN}}",
+      "enabled": true,
+      "dmPolicy": "allowlist",
+      "allowFrom": [
+        {{TELEGRAM_DEFAULT_CHAT_ID}}
+      ],
+      "groupAllowFrom": [
+        {{TELEGRAM_DEFAULT_CHAT_ID}}
+      ]
+    }
+  },
+  "plugins": {
+    "entries": {
+      "ollama": {
+        "enabled": true
+      },
+      "memory-core": {
+        "config": {}
+      },
+      "comfy": {
+        "config": {
+          "baseUrl": "http://127.0.0.1:8188",
+          "image": {
+            "workflowPath": "n:/allinall/openclaw-workspace/comfy-workflow-sdxl.json",
+            "promptNodeId": "6",
+            "promptInputName": "text",
+            "outputNodeId": "9"
+          }
+        },
+        "enabled": true
+      },
+      "duckduckgo": {
+        "enabled": true
+      },
+      "searxng": {
+        "config": {
+          "webSearch": {
+            "baseUrl": "http://127.0.0.1:8888",
+            "categories": "general",
+            "language": "de-DE"
+          }
+        },
+        "enabled": true
+      },
+      "openrouter": {
+        "enabled": true
+      },
+      "device-pair": {
+        "config": {
+          "publicUrl": "http://10.0.0.38:18789"
+        },
+        "enabled": true
+      }
+    }
+  }
+}

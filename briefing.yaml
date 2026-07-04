@@ -1,0 +1,29 @@
+# SCHÖPFER-MATRIX — Morgenbriefing-Konfiguration (N1)
+# Watchlist-Themen für tägliche arXiv-Abfrage (07:00 Uhr, Windows Scheduler)
+#
+# Felder:
+#   arxiv.topics  — Liste von {label, query}; query = arXiv-Suchwörter
+#   arxiv.max_results  — Treffer je Thema (Standard 3)
+#   arxiv.lookback_days — nur Paper der letzten N Tage (Standard 1)
+#   mail_allowlist — nur E-Mails von diesen Absendern werden als IMAP-Eingang akzeptiert (N5)
+
+arxiv:
+  max_results: 3
+  lookback_days: 1
+  topics:
+    - label: "LLM Agents & Tool-Calling"
+      query: "large language models agent tool calling MCP"
+    - label: "Lokale KI / On-Device"
+      query: "local inference quantization GGUF efficient LLM"
+    - label: "RAG & Vektor-Suche"
+      query: "retrieval augmented generation vector search reranker"
+    - label: "Strukturbiologie"
+      query: "protein structure prediction AlphaFold drug discovery"
+
+# N5 Mail-Eingang: nur E-Mails von diesen Absendern werden als IMAP-Eingang akzeptiert
+mail_allowlist:
+  - "starwars.felix@outlook.com"
+  - "ffarnberger@gmail.com"
+
+# Betreff-Präfix für eingehende Matrix-Aufträge via Mail (N5)
+mail_subject_prefix: "[MATRIX]"

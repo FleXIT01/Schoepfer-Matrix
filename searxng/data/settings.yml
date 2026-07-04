@@ -1,0 +1,50 @@
+# SearXNG-Konfiguration für Schöpfer-Matrix (V13)
+# Minimale Einstellungen; Rest wird aus den SearXNG-Defaults übernommen.
+
+use_default_settings: true
+
+general:
+  instance_name: "Schöpfer-Matrix Search"
+  enable_metrics: false
+
+search:
+  safe_search: 0
+  formats:
+    - html
+    - json      # JSON-API für research-mcp aktivieren
+
+server:
+  secret_key: "schoepfer-matrix-searxng-2026"
+  bind_address: "0.0.0.0:8080"
+  base_url: "http://localhost:8888"
+  image_proxy: false
+
+ui:
+  default_theme: simple
+  query_in_title: false
+
+# Datenschutz — keine externe Statistik
+outgoing:
+  request_timeout: 6.0
+  max_request_timeout: 15.0
+  useragent_suffix: ""
+  pool_connections: 100
+  pool_maxsize: 20
+
+engines:
+  - name: bing
+    engine: bing
+    shortcut: b
+    disabled: false
+  - name: duckduckgo
+    engine: duckduckgo
+    shortcut: d
+    disabled: false
+  - name: brave
+    engine: brave
+    shortcut: br
+    disabled: false
+  - name: wikipedia
+    engine: wikipedia
+    shortcut: w
+    disabled: false

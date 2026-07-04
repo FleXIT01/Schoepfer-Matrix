@@ -1,0 +1,24 @@
+# Zeilenenden deterministisch machen (statt auf core.autocrlf zu hoffen):
+# - Windows-Skripte MUESSEN CRLF haben (Batch bricht sonst!)
+# - Alles andere normalisiert Git im Repo auf LF.
+* text=auto
+
+*.cmd  text eol=crlf
+*.bat  text eol=crlf
+*.ps1  text eol=crlf
+*.vbs  text eol=crlf
+*.ahk  text eol=crlf
+
+*.py   text eol=lf
+*.md   text eol=lf
+*.yaml text eol=lf
+*.yml  text eol=lf
+*.json text eol=lf
+
+# Binaerdateien nie anfassen
+*.png  binary
+*.jpg  binary
+*.pdf  binary
+*.wav  binary
+*.tgz  binary
+*.zip  binary

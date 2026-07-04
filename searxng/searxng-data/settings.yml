@@ -1,0 +1,81 @@
+# SearXNG Konfiguration für Schöpfer-Matrix
+# Nur lokaler Zugriff (loopback), kein öffentlicher Zugang.
+
+use_default_settings: true
+
+general:
+  debug: false
+  instance_name: "Schöpfer-Matrix Search"
+  privacypolicy_url: false
+  donation_url: false
+  contact_url: false
+  enable_metrics: false
+
+search:
+  safe_search: 0
+  autocomplete: ""
+  default_lang: "de-DE"
+  languages:
+    - "de-DE"
+    - "en-US"
+  max_page: 5
+
+server:
+  secret_key: "schoepfer-matrix-searxng-2026"
+  limiter: false
+  public_instance: false
+  image_proxy: false
+  method: "GET"
+
+ui:
+  static_use_hash: true
+  default_locale: "de"
+  query_in_title: false
+  infinite_scroll: false
+  default_theme: simple
+
+# Nur JSON-API-Format aktivieren (für programmatischen Zugriff)
+outgoing:
+  request_timeout: 8.0
+  max_request_timeout: 15.0
+  useragent_suffix: ""
+  pool_connections: 100
+  pool_maxsize: 20
+  enable_http2: true
+
+engines:
+  - name: google
+    engine: google
+    shortcut: g
+    disabled: false
+
+  - name: duckduckgo
+    engine: duckduckgo
+    shortcut: d
+    disabled: false
+
+  - name: bing
+    engine: bing
+    shortcut: b
+    disabled: false
+
+  - name: startpage
+    engine: startpage
+    shortcut: sp
+    disabled: true
+
+  - name: wikipedia
+    engine: wikipedia
+    shortcut: wp
+    disabled: false
+    language: "de"
+
+  - name: arxiv
+    engine: arxiv
+    shortcut: ax
+    disabled: false
+
+  - name: github
+    engine: github
+    shortcut: gh
+    disabled: false

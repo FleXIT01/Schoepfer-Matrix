@@ -1,0 +1,18 @@
+# ══════════════════════════════════════════════════════════════════════
+# UNIVERSELLE SCHÖPFER-MATRIX — Abhängigkeiten
+# Einzige Requirements-Datei für das gesamte AI-OS Ökosystem.
+# Installation: pip install -r requirements.txt
+# ══════════════════════════════════════════════════════════════════════
+
+# ─── Kern (bot1 Orchestrator) ────────────────────────────────────────
+pydantic>=2.7.0
+jinja2>=3.1.4
+python-dotenv>=1.0.0
+rich>=13.0.0
+
+# ─── LLM Provider ───────────────────────────────────────────────────
+anthropic>=0.40.0
+openai>=1.30.0
+
+# ─── HTTP (Service-Bridges) ─────────────────────────────────────────
+httpx>=0.27.0

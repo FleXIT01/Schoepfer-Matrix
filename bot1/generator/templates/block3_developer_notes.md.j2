@@ -1,0 +1,119 @@
+## Developer Instructions: {{ spec.name }}
+
+### Setup und Konfiguration
+
+{% if spec.llm.provider == "anthropic" %}
+**Abhängigkeiten installieren:**
+```bash
+pip install anthropic
+```
+
+**Umgebungsvariable setzen:**
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```
+{% elif spec.llm.provider == "openai" %}
+**Abhängigkeiten installieren:**
+```bash
+pip install openai
+```
+
+**Umgebungsvariable setzen:**
+```
+OPENAI_API_KEY=sk-...
+```
+{% elif spec.llm.provider == "ollama" %}
+**Voraussetzungen:**
+1. [Ollama](https://ollama.com) installieren und starten
+2. Modell laden: `ollama pull {{ spec.llm.model or "llama3.1" }}`
+
+**Abhängigkeiten installieren:**
+```bash
+pip install httpx
+```
+
+Kein API-Key erforderlich.
+{% elif spec.llm.provider == "lmstudio" or spec.llm.provider == "openai-compat" %}
+**Voraussetzungen:**
+1. Lokalen LLM-Server starten (LM Studio oder kompatibler OpenAI-Endpoint)
+
+**Abhängigkeiten installieren:**
+```bash
+pip install openai
+```
+
+**Umgebungsvariable setzen:**
+```
+LLM_API_BASE=http://localhost:1234/v1
+```
+{% else %}
+**Abhängigkeiten:** Abhängig vom Provider — `bot_starter.py` und `requirements.txt` anpassen.
+{% endif %}
+
+---
+
+### Lokaler Start
+
+```bash
+python bot_starter.py
+```
+
+---
+
+### Erweiterungspunkte
+
+Alle Erweiterungspunkte in `bot_starter.py` sind mit `# EXTEND:` markiert:
+
+| Klasse | Zweck | Wo erweitern |
+|--------|-------|--------------|
+| `BotConfig` | Konfigurationsparameter | API-Keys, Feature-Flags, Provider-Optionen |
+| `BotMemory` | Gesprächsverlauf + Zustand | Persistenz, User-Kontext |
+| `BotTools` | Tool-Methoden und Definitionen | Tool-Implementierungen (siehe unten) |
+| `BotRunner.respond()` | Haupt-Bot-Schleife | Pre/Post-Processing, Fehlerbehandlung |
+
+---
+
+{% if spec.tools %}
+### Tool-Implementierung
+
+Die folgenden Stubs in `BotTools` müssen implementiert werden:
+
+{% for tool in spec.tools %}
+#### `{{ tool.name }}`
+
+**Beschreibung:** {{ tool.description }}
+
+```python
+def {{ tool.name }}(self, query: str) -> str:
+    # EXTEND: Implementierung hier einfügen
+    raise NotImplementedError
+```
+
+Gibt einen String zurück. `query` enthält die Nutzereingabe für dieses Tool.
+
+{% endfor %}
+{% else %}
+### Tools
+
+Keine Tools spezifiziert — `BotTools.get_tool_definitions()` gibt `[]` zurück.
+
+Zum nachträglichen Hinzufügen: Methode in `BotTools` anlegen, in `get_tool_definitions()` eintragen, `respond()` bei Bedarf um Tool-Aufruf-Logik erweitern.
+
+{% endif %}
+
+---
+
+### Bekannte Einschränkungen
+
+{% if spec.memory_strategy.value == "in_session" %}
+- **Session-only**: Gesprächskontext wird beim Beenden nicht gespeichert. Für Persistenz `BotMemory.save()`/`load()` implementieren.
+{% elif spec.memory_strategy.value == "persistent_json" or spec.memory_strategy.value == "persistent_db" %}
+- **JSON-Persistenz**: `BotMemory.save()` und `load()` sind implementiert und werden von `run_interactive()` aufgerufen.
+{% endif %}
+{% if spec.constraints %}
+{% for c in spec.constraints %}
+- {{ c }}
+{% endfor %}
+{% else %}
+- Keine weiteren spezifischen Einschränkungen definiert.
+{% endif %}

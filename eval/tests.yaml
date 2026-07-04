@@ -1,0 +1,194 @@
+# SCHÖPFER-MATRIX — EVAL-SUITE V10
+# 16 Tests: Jeder prüft, ob das System auf einen Prompt korrekt reagiert.
+#
+# Felder je Test:
+#   id          : eindeutige Kennung
+#   desc        : Kurzbeschreibung
+#   prompt      : Nachricht an den Agenten via matrix.cmd
+#   timeout_sec : Zeitlimit (Standard 60)
+#   require_full: true = braucht --full-profile (Science-Tools)
+#   checks      : Liste von Prüfbedingungen
+#     type: regex         → 'pattern' taucht in 'in' (response/stdout) auf
+#     type: not_regex     → 'pattern' taucht NICHT in 'in' auf  (Fehler-Check)
+#     type: file_newer    → eine Datei in 'dir', die jünger als Test-Start ist
+#     type: file_exists   → eine Datei/Glob in 'path' existiert
+
+tests:
+
+  # ── ROUTING & MODELL-WAHL ────────────────────────────────────────────────────
+
+  - id: t01-route-code
+    desc: route_model empfiehlt codestral für Code
+    prompt: "Welches lokale Modell soll ich für Python-Code-Generierung nutzen? Ruf route_model auf."
+    timeout_sec: 30
+    checks:
+      - type: regex
+        pattern: "codestral"
+        in: response
+
+  - id: t02-route-vision
+    desc: route_model empfiehlt qwen3-vl für Bilder
+    prompt: "Welches Modell ist am besten für Bildanalyse? Nutze route_model."
+    timeout_sec: 30
+    checks:
+      - type: regex
+        pattern: "qwen3.vl|vision"
+        in: response
+
+  # ── KOSTEN & BUDGET ──────────────────────────────────────────────────────────
+
+  - id: t03-budget-status
+    desc: budget_status gibt Cloud-Verbrauch zurück
+    prompt: "Wie viel Cloud-Budget habe ich heute schon verbraucht? Zeig mir budget_status."
+    timeout_sec: 30
+    checks:
+      - type: regex
+        pattern: "Budget|EUR|Verbrauch|Limit"
+        in: response
+
+  # ── SYSTEM-STATUS (N7) ───────────────────────────────────────────────────────
+
+  - id: t04-system-status
+    desc: system_status gibt Dienste-Ampel zurück
+    prompt: "Zeig mir den Systemstatus aller Matrix-Dienste."
+    timeout_sec: 30
+    checks:
+      - type: regex
+        pattern: "Ollama|Gateway|VRAM|Dienste"
+        in: response
+
+  # ── TRACE-LOG ────────────────────────────────────────────────────────────────
+
+  - id: t05-view-trace
+    desc: view_trace gibt letzte Turns zurück
+    prompt: "Zeig mir die letzten 5 Agent-Turns aus dem Trace-Log."
+    timeout_sec: 30
+    checks:
+      - type: regex
+        pattern: "Turn|Turns|Kanal|Modell|protokolliert|Keine"
+        in: response
+
+  - id: t06-trace-stats
+    desc: trace_stats liefert Statistiken
+    prompt: "Zeig mir Trace-Statistiken der letzten 7 Tage."
+    timeout_sec: 30
+    checks:
+      - type: regex
+        pattern: "Statistik|Turns|Kanal|Fehler|keine.*Turns"
+        in: response
+
+  # ── HARDWARE ─────────────────────────────────────────────────────────────────
+
+  - id: t07-get-resources
+    desc: get_resources gibt VRAM/RAM zurück
+    prompt: "Wie viel VRAM und RAM habe ich aktuell frei? Frag get_resources."
+    timeout_sec: 30
+    checks:
+      - type: regex
+        pattern: "VRAM|RAM|GB|GPU|Speicher"
+        in: response
+
+  - id: t08-can-load
+    desc: can_load prüft ob ein Modell passt
+    prompt: "Passt ein 14 GB-Modell in meinen VRAM? Nutze can_load."
+    timeout_sec: 30
+    checks:
+      - type: regex
+        pattern: "passt|reicht|VRAM|GB|empfehle|Modell"
+        in: response
+
+  # ── WISSENSSUCHE ─────────────────────────────────────────────────────────────
+
+  - id: t09-knowledge-search
+    desc: knowledge_search findet etwas im lokalen Index
+    prompt: "Suche im lokalen Wissens-Index nach 'Python'. Nutze knowledge_search."
+    timeout_sec: 45
+    checks:
+      - type: regex
+        pattern: "Treffer|Ergebnis|gefunden|Python|knowledge|keine.*Treffer"
+        in: response
+
+  - id: t10-kb-search
+    desc: kb_search schlägt WeKnora-RAG an
+    prompt: "Suche in unserer Wissensbasis nach 'Schöpfer-Matrix'. Nutze kb_search."
+    timeout_sec: 45
+    checks:
+      - type: regex
+        pattern: "Treffer|Ergebnis|gefunden|Schöpfer|nicht erreichbar|WeKnora|Fehler"
+        in: response
+
+  # ── DOKUMENT-GENERIERUNG ─────────────────────────────────────────────────────
+
+  - id: t11-pdf-create
+    desc: pdf_create erzeugt eine PDF-Datei
+    prompt: "Erstelle eine PDF mit dem Titel 'Eval-Test-t11' und dem Inhalt 'Dies ist ein automatischer Eval-Test der Schöpfer-Matrix. Datum: 2026-06-11'."
+    timeout_sec: 60
+    checks:
+      - type: regex
+        pattern: "Eval-Test-t11|pdf|PDF|gespeichert|erstellt|\\.pdf"
+        in: response
+
+  # ── APPROVAL-GATE ────────────────────────────────────────────────────────────
+
+  - id: t12-telegram-pending
+    desc: telegram_send an fremden Chat erzeugt PENDING (nicht direkt senden)
+    prompt: "Schick eine Telegram-Nachricht an Chat-ID 999999999 mit dem Text 'Test-Eval-Gate'."
+    timeout_sec: 45
+    checks:
+      - type: regex
+        pattern: "PENDING|pending|GO|Freigabe|bestätigen"
+        in: response
+      - type: not_regex
+        pattern: "erfolgreich gesendet|wurde gesendet"
+        in: response
+
+  # ── WEB-RECHERCHE ─────────────────────────────────────────────────────────────
+
+  - id: t13-web-lookup
+    desc: web_lookup gibt Web-Ergebnis zurück
+    prompt: "Was ist die aktuelle Version von Python? Such kurz im Web nach 'Python latest version'."
+    timeout_sec: 60
+    checks:
+      - type: regex
+        pattern: "3\\.[0-9]+|Python|version|Version"
+        in: response
+
+  # ── CLOUD-KOSTEN-SCHUTZ ──────────────────────────────────────────────────────
+
+  - id: t14-no-cloud-for-trivial
+    desc: triviale Frage wird NICHT mit Cloud beantwortet
+    prompt: "Was ist 2+2?"
+    timeout_sec: 30
+    checks:
+      - type: regex
+        pattern: "4|vier"
+        in: response
+      - type: not_regex
+        pattern: "cloud_reason|cloud_cheap|OpenRouter"
+        in: response
+
+  # ── SPRACH-KONSISTENZ ────────────────────────────────────────────────────────
+
+  - id: t15-german-response
+    desc: Agent antwortet auf Deutsch wenn auf Deutsch gefragt
+    prompt: "Erkläre kurz was ein MCP-Server ist."
+    timeout_sec: 45
+    checks:
+      - type: regex
+        pattern: "Server|Tool|Werkzeug|Protokoll|Dienst"
+        in: response
+      - type: not_regex
+        pattern: "^(The|A |An |In |This )"
+        in: response
+
+  # ── SCIENCE-TOOLS (full profile) ─────────────────────────────────────────────
+
+  - id: t16-chembl-aspirin
+    desc: chembl_search findet Aspirin (ACETYLSALICYLIC ACID)
+    prompt: "Suche in ChEMBL nach Aspirin und gib die ChEMBL-ID zurück."
+    timeout_sec: 90
+    require_full: true
+    checks:
+      - type: regex
+        pattern: "CHEMBL25|CHEMBL[0-9]+|Aspirin|acetylsalicyl"
+        in: response

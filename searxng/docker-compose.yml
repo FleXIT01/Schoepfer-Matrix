@@ -1,0 +1,18 @@
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: schoepfer-searxng
+    ports:
+      - "127.0.0.1:8888:8080"
+    volumes:
+      - ./searxng-data:/etc/searxng:rw
+    environment:
+      - SEARXNG_SECRET_KEY=schoepfer-matrix-searxng-2026
+      - SEARXNG_BASE_URL=http://localhost:8888
+    restart: unless-stopped
+    networks:
+      - searxng-net
+
+networks:
+  searxng-net:
+    name: searxng-net

@@ -1,0 +1,141 @@
+# SCHÖPFER-MATRIX — GOLDEN CASES (V14)
+# Schnelle Regressions-Harness: prüft per direktem Ollama-Tool-Calling, ob das
+# Modell (gpt-oss-32k) bei typischen Anfragen das RICHTIGE Tool wählt und korrekt
+# antwortet — mit den ECHTEN Tool-Schemas (tool_catalog.json) + echtem System-Prompt
+# (AGENTS.md). Läuft in Sekunden, deterministisch (temperature 0), ohne Gateway.
+#
+# Check-Felder je Case (alle optional, mind. einer):
+#   expect_tool   : Regex; mind. EIN aufgerufenes Tool muss matchen (Tool-Wahl)
+#   expect_arg    : Regex auf die JSON-Argumente der Tool-Calls
+#   expect_text   : Regex auf den finalen Antworttext
+#   expect_no_cloud: true -> KEIN cloud_*-Tool darf gewählt werden (Kostenschutz)
+#   expect_direct : true -> Modell soll OHNE Tool antworten (Smalltalk/triviales)
+
+cases:
+  # ── Routing & Modellwahl ──────────────────────────────────────────────
+  - id: g01-route-code
+    prompt: "Welches lokale Modell soll ich für Python-Code-Generierung nehmen? Frag das Routing."
+    expect_tool: "llm__route_model"
+    expect_no_cloud: true
+
+  # Akzeptabel: route_model aufrufen ODER direkt das Vision-Modell nennen.
+  - id: g02-route-vision
+    prompt: "Welches Modell eignet sich am besten zur Bildanalyse? Nutze das Routing."
+    expect_any: true
+    expect_tool: "llm__route_model|llm__vision_describe"
+    expect_text: "qwen|vision|multimodal|bild"
+
+  - id: g03-code-generate
+    prompt: "Schreib mir eine Python-Funktion, die prüft ob eine Zahl eine Primzahl ist."
+    expect_tool: "llm__code_generate|llm__route_model"
+    expect_no_cloud: true
+
+  # ── Kosten & Budget ───────────────────────────────────────────────────
+  - id: g04-budget
+    prompt: "Wie viel Cloud-Budget habe ich heute schon verbraucht?"
+    expect_tool: "llm__budget_status"
+
+  # ── System & Hardware ─────────────────────────────────────────────────
+  - id: g05-system-status
+    prompt: "Zeig mir den Status aller Matrix-Dienste."
+    expect_tool: "status__system_status"
+
+  - id: g06-resources
+    prompt: "Wie viel VRAM und RAM habe ich gerade frei?"
+    expect_tool: "planner__get_resources"
+
+  - id: g07-can-load
+    prompt: "Passt ein 14-GB-Modell noch in meinen VRAM?"
+    expect_tool: "planner__can_load|planner__get_resources"
+
+  # ── Trace / Observability (inkl. neuer step_stats) ────────────────────
+  - id: g08-view-trace
+    prompt: "Zeig mir die letzten 5 Agent-Turns aus dem Trace-Log."
+    expect_tool: "trace__view_trace"
+
+  - id: g09-trace-stats
+    prompt: "Gib mir die Trace-Statistiken der letzten 7 Tage."
+    expect_tool: "trace__trace_stats"
+
+  - id: g10-step-bottleneck
+    prompt: "Wo geht in der Pipeline die meiste Zeit hin? Welcher Schritt ist der Engpass?"
+    expect_tool: "trace__step_stats"
+
+  # ── Wissen & RAG ──────────────────────────────────────────────────────
+  - id: g11-kb-search
+    prompt: "Such in unserer Wissensbasis nach 'Schöpfer-Matrix Architektur'."
+    expect_tool: "kb__kb_search"
+
+  - id: g12-playbook
+    prompt: "Wie haben wir letztes Mal ein Repo-Review gemacht? Gibt es ein Playbook?"
+    expect_tool: "kb__playbook_(lookup|list)"
+
+  # ── Dokumente ─────────────────────────────────────────────────────────
+  - id: g13-pdf-create
+    prompt: "Erstelle eine PDF mit dem Titel 'Test' und dem Inhalt 'Hallo Welt'."
+    expect_tool: "pdf__pdf_create"
+
+  # ── Web-Recherche ─────────────────────────────────────────────────────
+  - id: g14-web-lookup
+    prompt: "Was ist die aktuelle Version von Python? Schau kurz im Web nach."
+    expect_tool: "research__web_lookup|research__deep_research"
+
+  - id: g15-deep-research
+    prompt: "Mach eine gründliche Recherche über die Geschichte des Wiener Erzbistums."
+    expect_tool: "research__deep_research|assistant__research_pdf_send"
+
+  # ── Computer-Steuerung ────────────────────────────────────────────────
+  - id: g16-run-command
+    prompt: "Wie spät ist es gerade? Frag den Computer."
+    expect_tool: "assistant__run_command"
+
+  - id: g17-open-app
+    prompt: "Öffne den Taschenrechner auf dem PC."
+    expect_tool: "assistant__run_command"
+
+  # can_load ist hier GUELTIG: der Prompt verlangt auch Beschreibung (=Vision, qwen3-vl
+  # ~20 GB) und AGENTS.md schreibt den VRAM-Check VOR Vision explizit vor.
+  - id: g18-screenshot
+    prompt: "Mach einen Screenshot vom Bildschirm und sag mir was zu sehen ist."
+    expect_tool: "screenshot__screenshot_take|screenshot__vision_pipeline|planner__can_load|planner__get_resources"
+
+  # ── Kommunikation (Approval-Gate serverseitig) ────────────────────────
+  # telegram_send verschickt eine DATEI (file_path), KEINEN freien Text — Case passend gemacht.
+  - id: g19-telegram
+    prompt: "Schick die Datei n:/allinall/output/test.pdf per Telegram an Chat-ID 999999999."
+    expect_tool: "mail__telegram_send"
+
+  - id: g20-email
+    prompt: "Schreib eine E-Mail an test@example.com mit Betreff 'Hallo' und Text 'Test'."
+    expect_tool: "mail__email_send"
+
+  # ── Profil (profile_get = aktives TOOL-Profil, kein Nutzerprofil) ──────
+  - id: g21-profile
+    prompt: "Welches Tool-Profil ist gerade aktiv und welche Profile gibt es?"
+    expect_tool: "profile__profile_get|profile__profile_list"
+
+  # ── Recherche→PDF→Versand in einem Schritt ────────────────────────────
+  - id: g22-research-pdf-send
+    prompt: "Recherchiere kurz die aktuellen Mars-Missionen und schick mir das als PDF."
+    expect_tool: "assistant__research_pdf_send|research__deep_research"
+
+  # ── Kostenschutz: triviale Frage NICHT in die Cloud ───────────────────
+  - id: g23-trivial-no-cloud
+    prompt: "Was ist 2+2?"
+    expect_text: "4|vier"
+    expect_no_cloud: true
+
+  # ── Sprach-Konsistenz: kurze Wissensfrage auf Deutsch ─────────────────
+  - id: g24-german-direct
+    prompt: "Erkläre in einem Satz, was ein MCP-Server ist."
+    expect_text: "Server|Tool|Werkzeug|Protokoll|Dienst|Schnittstelle"
+    expect_no_cloud: true
+
+  # ── Sofort-Backup per Chat (/backup bzw. natürliche Sprache) ──────────
+  - id: g25-backup
+    prompt: "Mach ein Backup von allem."
+    expect_tool: "assistant__backup_now"
+
+  - id: g26-backup-natural
+    prompt: "Bitte sichere die Matrix, ich will ein aktuelles Backup haben."
+    expect_tool: "assistant__backup_now"

@@ -1,0 +1,150 @@
+{
+  "_comment": "Tool-Profile fuer die Schoepfer-Matrix (Phase B, V1). Jedes Profil definiert eine deny-Liste fuer openclaw.json tools.deny. profile_mcp/server.py wendet das aktive Profil an.",
+  "_convention": "Schluessel = OpenClaw-Format: <server>__<tool>  (doppelter Unterstrich)",
+
+  "_manifest": {
+    "science":    ["arxiv_search","openalex_search","pubmed_search","europepmc_search","alphafold_fetch","rcsb_pdb","chembl_search","string_db","ensembl_lookup","reactome_search","openfda_search"],
+    "factory":    ["list_capabilities","build_bot","verify_package","start_webapp","screenshot_webapp"],
+    "github":     ["get_issue","list_issues","clone_or_pull","create_branch","commit_push","create_pr"],
+    "hook":       ["webhook_call"],
+    "jobs":       ["job_submit","job_start","job_complete","job_fail","job_cancel","job_status","job_list","auto_research_quota"],
+    "kb":         ["kb_search","kb_ingest","kb_ingest_url","playbook_save","playbook_lookup","playbook_list","kb_dedup","kb_resolve_conflicts","kb_stats"],
+    "knowledge":  ["knowledge_search","knowledge_stats"],
+    "llm":        ["code_generate","vision_describe","reason_deep","quick_answer","cloud_reason","cloud_cheap","cloud_code","council","budget_status","route_model","routing_stats"],
+    "mail":       ["email_send","telegram_send","telegram_send_voice","confirm_action","list_pending","cancel_action","delivery_status"],
+    "molviz":     ["protein_3d","molecule_3d"],
+    "office":     ["create_docx","read_docx","create_pptx","read_pptx","create_xlsx","read_xlsx"],
+    "pdf":        ["pdf_create","pdf_extract","pdf_summarize","pdf_translate"],
+    "planner":    ["get_resources","can_load","recommend"],
+    "quiz":       ["quiz_start","quiz_answer","quiz_stats","quiz_topics"],
+    "research":   ["deep_research","web_lookup"],
+    "review":     ["review_code","review_file","scan_repo","visual_review"],
+    "screenshot": ["screenshot_take","vision_pipeline"],
+    "status":     ["system_status"],
+    "trace":      ["log_turn","view_trace","trace_stats"],
+    "voice":      ["transcribe","speak"],
+    "wiki":       ["repo_tree","document_repo","list_article_topics","build_in_public"],
+    "assistant":  ["research_pdf_send","download_file","run_command"]
+  },
+
+  "profiles": {
+    "full": {
+      "description": "Alle Tools verfuegbar — keine Einschraenkung. Nur fuer explizite Freigabe.",
+      "deny": []
+    },
+
+    "coding": {
+      "description": "Coding/Dev: llm, research, kb, github, jobs, review, wiki, office, trace, pdf. Kein Science/Bio, kein Voice, kein Quiz.",
+      "deny": [
+        "science__arxiv_search","science__openalex_search","science__pubmed_search",
+        "science__europepmc_search","science__alphafold_fetch","science__rcsb_pdb",
+        "science__chembl_search","science__string_db","science__ensembl_lookup",
+        "science__reactome_search","science__openfda_search",
+        "molviz__protein_3d","molviz__molecule_3d",
+        "voice__transcribe","voice__speak",
+        "quiz__quiz_start","quiz__quiz_answer","quiz__quiz_stats","quiz__quiz_topics",
+        "knowledge__knowledge_search","knowledge__knowledge_stats",
+        "hook__webhook_call",
+        "assistant__run_command",
+        "screenshot__screenshot_take","screenshot__vision_pipeline"
+      ]
+    },
+
+    "research": {
+      "description": "Recherche/Analyse: llm, research, kb, pdf, science, knowledge, trace, planner. Kein Schreiben/Senden, kein GitHub-Push.",
+      "deny": [
+        "factory__build_bot","factory__verify_package","factory__start_webapp","factory__screenshot_webapp",
+        "molviz__protein_3d","molviz__molecule_3d",
+        "wiki__repo_tree","wiki__document_repo","wiki__build_in_public",
+        "github__clone_or_pull","github__create_branch","github__commit_push","github__create_pr",
+        "office__create_docx","office__create_pptx","office__create_xlsx",
+        "quiz__quiz_start","quiz__quiz_answer","quiz__quiz_stats","quiz__quiz_topics",
+        "voice__transcribe","voice__speak",
+        "hook__webhook_call",
+        "mail__email_send","mail__telegram_send","mail__telegram_send_voice",
+        "assistant__run_command","assistant__download_file",
+        "screenshot__screenshot_take","screenshot__vision_pipeline"
+      ]
+    },
+
+    "comms": {
+      "description": "Kommunikation/Schreiben: llm, mail, kb, pdf, office, trace. Kein Code, kein GitHub, kein Science.",
+      "deny": [
+        "science__arxiv_search","science__openalex_search","science__pubmed_search",
+        "science__europepmc_search","science__alphafold_fetch","science__rcsb_pdb",
+        "science__chembl_search","science__string_db","science__ensembl_lookup",
+        "science__reactome_search","science__openfda_search",
+        "factory__build_bot","factory__verify_package","factory__start_webapp","factory__screenshot_webapp",
+        "review__review_code","review__review_file","review__scan_repo","review__visual_review",
+        "molviz__protein_3d","molviz__molecule_3d",
+        "wiki__repo_tree","wiki__document_repo","wiki__build_in_public",
+        "github__get_issue","github__list_issues","github__clone_or_pull",
+        "github__create_branch","github__commit_push","github__create_pr",
+        "quiz__quiz_start","quiz__quiz_answer","quiz__quiz_stats","quiz__quiz_topics",
+        "voice__transcribe","voice__speak",
+        "hook__webhook_call",
+        "jobs__job_submit","jobs__job_start","jobs__job_complete","jobs__job_fail",
+        "jobs__job_cancel","jobs__job_status","jobs__job_list","jobs__auto_research_quota",
+        "planner__get_resources","planner__can_load","planner__recommend",
+        "knowledge__knowledge_search","knowledge__knowledge_stats",
+        "assistant__run_command","assistant__download_file",
+        "screenshot__screenshot_take","screenshot__vision_pipeline"
+      ]
+    },
+
+    "vision": {
+      "description": "Vision/Screen: llm (inkl. vision_describe), screenshot, review (visual_review), jobs, trace. Vorbereitung Phase C.",
+      "deny": [
+        "science__arxiv_search","science__openalex_search","science__pubmed_search",
+        "science__europepmc_search","science__alphafold_fetch","science__rcsb_pdb",
+        "science__chembl_search","science__string_db","science__ensembl_lookup",
+        "science__reactome_search","science__openfda_search",
+        "factory__build_bot","factory__verify_package",
+        "molviz__protein_3d","molviz__molecule_3d",
+        "wiki__repo_tree","wiki__document_repo","wiki__build_in_public",
+        "github__clone_or_pull","github__create_branch","github__commit_push","github__create_pr",
+        "office__create_docx","office__create_pptx","office__create_xlsx",
+        "quiz__quiz_start","quiz__quiz_answer","quiz__quiz_stats","quiz__quiz_topics",
+        "voice__transcribe","voice__speak",
+        "hook__webhook_call",
+        "mail__email_send","mail__telegram_send","mail__telegram_send_voice",
+        "kb__kb_ingest","kb__kb_ingest_url","kb__kb_dedup","kb__kb_resolve_conflicts",
+        "knowledge__knowledge_search","knowledge__knowledge_stats",
+        "assistant__run_command","assistant__download_file","assistant__research_pdf_send",
+        "research__deep_research","research__web_lookup"
+      ]
+    },
+
+    "minimal": {
+      "description": "Minimale Flaeche: nur llm, jobs, trace, status. Fuer sicherheitskritische Aufgaben.",
+      "deny": [
+        "science__arxiv_search","science__openalex_search","science__pubmed_search",
+        "science__europepmc_search","science__alphafold_fetch","science__rcsb_pdb",
+        "science__chembl_search","science__string_db","science__ensembl_lookup",
+        "science__reactome_search","science__openfda_search",
+        "factory__list_capabilities","factory__build_bot","factory__verify_package",
+        "factory__start_webapp","factory__screenshot_webapp",
+        "github__get_issue","github__list_issues","github__clone_or_pull",
+        "github__create_branch","github__commit_push","github__create_pr",
+        "hook__webhook_call",
+        "kb__kb_search","kb__kb_ingest","kb__kb_ingest_url","kb__playbook_save",
+        "kb__playbook_lookup","kb__playbook_list","kb__kb_dedup","kb__kb_resolve_conflicts","kb__kb_stats",
+        "knowledge__knowledge_search","knowledge__knowledge_stats",
+        "mail__email_send","mail__telegram_send","mail__telegram_send_voice",
+        "mail__confirm_action","mail__list_pending","mail__cancel_action","mail__delivery_status",
+        "molviz__protein_3d","molviz__molecule_3d",
+        "office__create_docx","office__read_docx","office__create_pptx","office__read_pptx",
+        "office__create_xlsx","office__read_xlsx",
+        "pdf__pdf_create","pdf__pdf_extract","pdf__pdf_summarize","pdf__pdf_translate",
+        "planner__get_resources","planner__can_load","planner__recommend",
+        "quiz__quiz_start","quiz__quiz_answer","quiz__quiz_stats","quiz__quiz_topics",
+        "research__deep_research","research__web_lookup",
+        "review__review_code","review__review_file","review__scan_repo","review__visual_review",
+        "voice__transcribe","voice__speak",
+        "wiki__repo_tree","wiki__document_repo","wiki__list_article_topics","wiki__build_in_public",
+        "assistant__research_pdf_send","assistant__download_file","assistant__run_command",
+        "screenshot__screenshot_take","screenshot__vision_pipeline"
+      ]
+    }
+  }
+}

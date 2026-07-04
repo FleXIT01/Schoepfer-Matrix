@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$comment": "Generiert von Bot Generator | {{ spec.generated_at }} | Bot: {{ spec.name }}",
+  "bot_name": "{{ spec.name }}",
+  "bot_type": "{{ spec.bot_type.value }}",
+  "memory_strategy": "{{ spec.memory_strategy.value }}",
+
+  "input_schema": {
+    "type": "object",
+    "description": "Eingabe-Schema für {{ spec.name }}",
+    "properties": {
+      {% for f in spec.input_schema.fields %}
+      "{{ f.name }}": {
+        "type": "{{ f.type }}",
+        "description": "{{ f.description }}"{% if not loop.last %},{% endif %}
+
+      }{% if not loop.last %},{% endif %}
+
+      {% endfor %}
+    },
+    "required": [{% for f in spec.input_schema.fields if f.required %}"{{ f.name }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+  },
+
+  "output_schema": {
+    "type": "object",
+    "description": "Ausgabe-Schema für {{ spec.name }}",
+    "properties": {
+      {% for f in spec.output_schema.fields %}
+      "{{ f.name }}": {
+        "type": "{{ f.type }}",
+        "description": "{{ f.description }}"
+      }{% if not loop.last %},{% endif %}
+
+      {% endfor %}
+    },
+    "required": [{% for f in spec.output_schema.fields if f.required %}"{{ f.name }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+  },
+
+  "state_memory_schema": {
+    "type": "object",
+    "description": "Zustand/Memory-Schema für {{ spec.name }} (Strategie: {{ spec.memory_strategy.value }})",
+    "properties": {
+      {% for f in spec.state_schema.fields %}
+      "{{ f.name }}": {
+        "type": "{{ f.type }}",
+        "description": "{{ f.description }}"
+      }{% if not loop.last %},{% endif %}
+
+      {% endfor %}
+    }
+  },
+
+  "tool_definitions": [
+    {% for tool in spec.tools %}
+    {
+      "name": "{{ tool.name }}",
+      "description": "{{ tool.description }}",
+      "input_schema": {
+        "type": "object",
+        "properties": {{ tool.parameters | tojson(indent=6) }},
+        "required": {{ tool.parameters.keys() | list | tojson }}
+      },
+      "returns": "{{ tool.returns }}"
+    }{% if not loop.last %},{% endif %}
+
+    {% endfor %}
+  ]
+}

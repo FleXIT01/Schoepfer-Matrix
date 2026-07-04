@@ -1,0 +1,10 @@
+# Block 1 — Anforderungen: {{ spec.name }}
+
+> Generiert am {{ spec.generated_at }} | Konfidenz: {{ "%.0f"|format(spec.confidence_score * 100) }}%
+{% if spec.missing_fields %}
+> **WARNUNG:** Fehlende Informationen in {{ spec.missing_fields|length }} Feldern (mit TODO markiert).
+{% endif %}
+
+---
+
+{{ block1_content }}

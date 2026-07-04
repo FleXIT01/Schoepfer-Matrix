@@ -1,0 +1,308 @@
+================================================================================
+  MASTERPLAN V3 — SCHÖPFER-MATRIX
+  "Der Kern wird erwachsen" — Immunsystem · Langzeitgedächtnis · Flywheel
+================================================================================
+  Erstellt:   2026-06-12
+  Basis:      v1 (Phasen 0-4, Körper)  +  V2 (Phasen 6-10, Nerven & Sinne)
+              +  Addendum I1-I6 (Peripherie)
+  Leitsatz:   V3 macht das System NICHT breiter, sondern den KERN reifer.
+              Keine neuen Kanäle. Stattdessen: übersteht eigene Fehler,
+              merkt sich WIE es Dinge schafft, und tunt sich beweisbar selbst.
+  Eiserne     Nichts aus V3 vor der Phase-6-Sicherung (Backups, Gates, Ledger).
+  Regel:      Mächtig auf ungesichertem Single-Rechner = Haftung, kein Asset.
+================================================================================
+
+--------------------------------------------------------------------------------
+0. WARUM V3 (und warum nicht noch mehr Features)
+--------------------------------------------------------------------------------
+  v1 = Körper.  V2 = Nerven & Sinne (festigen/messen/öffnen).  I1-I6 = Peripherie.
+  Was fehlt, damit man dem System UNBEAUFSICHTIGT vertraut, sind drei Organe:
+
+    SÄULE A — IMMUNSYSTEM      Der Agent-Loop selbst überlebt Fehler, nicht nur
+                              die Prozesse (Watchdog startet tote Prozesse;
+                              die DENK-Schleife hatte bisher null Erholung).
+    SÄULE B — LANGZEITGEDÄCHTNIS  RAG merkt Fakten. V3 merkt VERFAHREN: WIE eine
+                              Aufgabe gelöst wurde. Wiederkehrende Arbeit wird
+                              mit jedem Mal schneller UND zuverlässiger.
+    SÄULE C — FLYWHEEL        Selbstverbesserung als ZAHL statt Gefühl: jede
+                              Änderung erst gegen die Eval-Suite, nur bei Sieg
+                              übernommen, jederzeit zurückrollbar.
+
+  8 Punkte gesamt:  R1-R4 (Immunsystem) · G1-G2 (Gedächtnis) · F1-F2 (Flywheel).
+  Querschnitt, fast keine neue Oberfläche — der KERN wird klüger.
+
+--------------------------------------------------------------------------------
+1. SÄULE A — IMMUNSYSTEM (Robustheit des Kerns)
+--------------------------------------------------------------------------------
+
+R1 — FALLBACK-KETTEN PRO FÄHIGKEIT  (nicht pro Tool)        [Herzstück A]
+  Problem:   Heute scheitert ein Schritt HART, wenn ein Modell/Dienst weg ist.
+             V2-Watchdog startet Prozesse neu — die laufende Aufgabe stirbt
+             trotzdem.
+  Lösung:    Fähigkeiten (nicht Tools) bekommen eine LEITER. Beispiel
+             "schließend folgern":
+               gpt-oss lokal
+                 -> bei OOM/Timeout/Verweigerung: cloud_cheap (DeepSeek)
+                   -> bei Budget-Sperre (V9): kleineres lokales Modell
+                     -> sonst: ehrliches "konnte nicht, hier ist der Stand".
+             Das System fällt nie hart aus, es geht die Leiter runter UND SAGT,
+             auf welcher Sprosse es gelandet ist (im Trace + in der Antwort).
+  Bauplan:   - Fähigkeits-Register: {reason, code, vision, research, extract, ...}
+               -> je eine geordnete Provider-Liste.
+             - Wrapper run_capability(name, payload) probiert die Leiter ab,
+               loggt jede Stufe + Grund des Abstiegs.
+             - Abbruchgründe sauber klassifizieren: OOM != Timeout !=
+               Modell-Verweigerung != inhaltlicher Fehler (nur die ersten drei
+               lösen Fallback aus; inhaltliche Fehler NICHT — sonst maskiert
+               man echte Bugs).
+  Beweis:    Ollama mitten im Turn killen -> Aufgabe läuft auf cloud_cheap zu
+             Ende, Antwort vermerkt den Abstieg, KEIN harter Abbruch.
+
+R2 — CIRCUIT BREAKER  (kranke Komponente vergiftet nicht alles)
+  Problem:   Hängt research-mcp, friert es JEDEN Turn ein, der es streift.
+  Lösung:    Schalter pro Komponente: 3 Fehlschläge in Folge -> Schalter AUF
+             -> 5 Minuten nicht mehr aufrufen, sofort klare Meldung zurück
+             ("research-mcp temporär aus, Grund X"). Nach Cooldown halb-offen:
+             ein Probe-Call; Erfolg -> zu, Fehler -> weitere 5 min auf.
+  Bauplan:   Zustand (closed/open/half-open) + Zähler + Zeitstempel in SQLite
+             (teilt sich die DB mit Ledger/Traces). Dekorator @breaker("name")
+             vor jeden externen Aufruf. Zustandswechsel -> Trace + optional
+             Telegram bei "open".
+  Beweis:    research-mcp absichtlich lahmlegen -> nach 3 Fails meldet das
+             System sofort statt zu hängen; nach 5 min Selbstheilung.
+
+R3 — IDEMPOTENZ + AKTIONS-LEDGER  (autonomes Handeln wird SICHER)  [kritisch]
+  Problem:   Ein abgestürzter, neu gestarteter Job könnte Mail/PR/Telegram
+             DOPPELT auslösen. Das ist der Sargnagel für unbeaufsichtigtes
+             Handeln.
+  Lösung:    JEDE Aktion nach außen bekommt einen IDEMPOTENZ-KEY (Hash aus
+             Absicht+Inhalt+Zielfenster). Vor Ausführung: Key schon im
+             Aktions-Ledger? -> nicht erneut senden, alten Beleg zurückgeben.
+             Zusammen mit dem V6-GO-Gate ist das das Fundament, dem man
+             selbstständige Außen-Aktionen anvertrauen kann.
+  Bauplan:   actions-Tabelle: key, tool, args_hash, status(pending/done/failed),
+             ergebnis, zeit. Dekorator @idempotent in mail-/telegram-/hook-/
+             repo-fix-Pfaden. Key WIRD VOR dem Senden geschrieben (pending),
+             nach Erfolg auf done — so überlebt er auch einen Crash mitten im
+             Senden.
+  Beweis:    Mail-Job killen, neu starten -> exakt EINE Mail draußen, zweiter
+             Lauf erkennt den Key und sendet nicht.
+
+R4 — CHECKPOINT & RESUME für Langläufer
+  Problem:   Gateway-Neustart mitten in build-bot/deep-research = halbfertiger
+             Müll im Ordner, Arbeit verloren.
+  Lösung:    Langläufer schreiben nach JEDEM Schritt ihren Zustand (welcher
+             Schritt, Zwischenergebnisse, nächster Schritt). Neustart -> der
+             Job-Runner (jobs-mcp, N7) sieht offene Jobs und macht ab dem
+             letzten GUTEN Schritt weiter, nicht von vorn.
+  Bauplan:   - Langläufer als Schritt-Liste mit explizitem State-Objekt.
+             - checkpoint(job_id, step, state) nach jedem Schritt (SQLite/JSON).
+             - Beim Start prüft jobs-mcp auf "unterbrochen" -> resume().
+             - Verzahnt mit R3: bereits ausgeführte Außen-Aktionen werden beim
+               Resume per Idempotenz-Key NICHT wiederholt.
+  Beweis:    build-bot bei Schritt 4/7 hart abschießen -> nach Neustart läuft
+             er ab Schritt 5 weiter, Endpaket ist vollständig & sauber.
+
+--------------------------------------------------------------------------------
+2. SÄULE B — LANGZEITGEDÄCHTNIS (prozedural, nicht nur faktisch)
+--------------------------------------------------------------------------------
+
+G1 — PLAYBOOKS: prozedurales Gedächtnis  (WIE etwas geschafft wurde)  [größter
+                                                            "wird-besser"-Hebel]
+  Idee:      RAG merkt FAKTEN. Die Neugier-Schleife (I4) merkt GELERNTE Fakten.
+             G1 merkt das VERFAHREN: nach jeder mehrstufigen Aufgabe, die ihr
+             Gate bestanden hat, destilliert ein Reflexions-Schritt ein
+             PLAYBOOK:
+               "Aufgabentyp X -> diese Schritte, diese Tools, diese Parameter,
+                DAS war die Stolperstelle, so umgangen."
+  Nutzung:   Beim nächsten ähnlichen Auftrag holt der supervisor ZUERST das
+             passende Playbook (gekeyt auf die Aufgaben-Signatur) und PASST ES
+             AN, statt alles neu herzuleiten. Wiederkehrende Arbeit wird mit
+             jedem Mal schneller UND zuverlässiger.
+  Bauplan:   - Neue kb-Collection "playbooks".
+             - Aufgaben-Signatur = grobe Kategorie + Schlüsselbegriffe
+               (z.B. "android-app+protein", "repo-review+python").
+             - Reflexions-Schritt am Ende erfolgreicher supervisor-Läufe:
+               schreibt Schrittfolge, genutzte Tools/Parameter, Fehlschläge+Fix
+               -> kb_ingest(collection="playbooks", meta={signatur, datum,
+               erfolg=true}).
+             - supervisor-Start: playbook_lookup(signatur) -> falls Treffer,
+               als Startplan laden + anpassen statt blank planen.
+  Schutz:    NUR Läufe speichern, die das Gate WIRKLICH bestanden haben (sonst
+             lernt man Murks). Playbooks sind Vorschlag, nicht Befehl —
+             Abweichung erlaubt, wenn die Lage anders ist (D16).
+  Beweis:    Gleichen Aufgabentyp zweimal stellen: Lauf 2 ist messbar schneller
+             (weniger Planungs-Turns/Tokens, im Trace sichtbar) und nutzt das
+             Playbook.
+
+G2 — GEDÄCHTNIS-HYGIENE: Verdichtung, Dedup, Konfliktauflösung
+  Problem:   Drei wachsende Speicher (learnings, playbooks, episodische Traces)
+             driften: Dubletten, veraltete und WIDERSPRÜCHLICHE Einträge.
+             Ungepflegtes Gedächtnis macht Abrufe schlechter, nicht besser.
+  Lösung:    Wöchentlicher Pflege-Lauf (Cron, neben der Retro N9):
+               - near-duplicate learnings zusammenfassen (Embedding-Nähe).
+               - widersprüchliche Fakten markieren -> neuere/besser belegte
+                 gewinnt, alte wird "veraltet" statt gelöscht.
+               - sehr alte episodische Traces verdichten (Rohdaten archivieren,
+                 Essenz behalten) -> Index bleibt schlank.
+  Bauplan:   kb-mcp: kb_dedup(collection), kb_resolve_conflicts(collection).
+             Lauf protokolliert "x zusammengeführt, y als veraltet markiert"
+             ins Morgenbriefing (N1).
+  Schutz:    NIE hart löschen — immer Original archivieren + Verdichtung daneben
+             (D19). Reversibel halten.
+  Beweis:    Zwei widersprüchliche learnings einspeisen -> nach Pflege-Lauf
+             liefert kb_search die aktuelle, korrekt als solche markiert.
+
+--------------------------------------------------------------------------------
+3. SÄULE C — FLYWHEEL (Selbstverbesserung mit Beweis)
+--------------------------------------------------------------------------------
+
+F1 — AUTO-TUNING MIT SCHATTEN-LAUF & ROLLBACK  (Verbesserung = Zahl)
+  Idee:      Die Wochen-Retro (N9) SCHLÄGT VOR. F1 schließt die Schleife:
+               Vorschlag (Prompt/Skill-Beschreibung/Parameter ändern)
+                 -> SCHATTEN-LAUF gegen die Eval-Suite (V2, Golden Tasks)
+                   -> nur übernehmen, wenn Score >= aktueller Score
+                     -> versionieren (Diff behalten) + Sofort-Rollback bereit.
+             Jetzt ist "besser" beweisbar. Das System darf sich SELBST tunen,
+             weil jede Änderung evidenzgedeckt UND umkehrbar ist.
+  Bauplan:   - Eval-Runner (V2:V10) bekommt Modus "shadow": Kandidat-Änderung
+               in Sandbox-Config, komplette Suite fahren, Score vs. Baseline.
+             - Änderungsobjekt: {ziel-datei, diff, begründung, eval_vorher,
+               eval_nachher}. Übernahme schreibt nach matrix-infra (V2:V14),
+               taggt Version, hält rollback().
+             - Regressionssperre: sinkt IRGENDEIN Kern-Test, wird NICHT
+               übernommen, egal wie gut der Schnitt.
+  Autonomie: D17 entscheidet — Auto-Übernahme bei klarem Sieg, oder immer GO.
+             Empfehlung Start: GO-Pflicht, später Auto für reine Prompt-Tweaks.
+  Beweis:    Absichtlich schlechtere Prompt-Variante einreichen -> F1 LEHNT AB
+             (Score sinkt). Echte Verbesserung -> wird übernommen, Version
+             getaggt, Rollback nachweislich möglich.
+
+F2 — EMPIRISCHES ROUTING  (datengetrieben statt handgeschrieben)   [das genuin
+                                                              Neue an V3]
+  Idee:      Heute steht Routing als HANDREGEL in AGENTS.md ("Code -> codestral").
+             Sobald das Trace-Log (V2:V3) echte Ergebnisse sammelt, wird Routing
+             EMPIRISCH: der Router liest historischen Erfolg / Latenz / Kosten
+             pro (Aufgabentyp, Modell) und wählt das BELEGT beste — und passt
+             sich an, während mehr Daten auflaufen. Die Handregeln werden zum
+             Kaltstart-Prior, die Daten übernehmen.
+             Das ist der Unterschied zwischen einer Config-Datei und einem
+             System, das sein eigenes optimales Verhalten LERNT. Möglich NUR,
+             weil V2 das Trace-Log gebaut hat -> sauberer V3-Schlussstein.
+  Bauplan:   - Aus Traces je (aufgabentyp, modell) aggregieren: Erfolgsquote,
+               Median-Latenz, Ø-Kosten (rollierendes Fenster).
+               -> Tool routing_stats().
+             - route_model() nutzt: genug Daten (>= Schwelle, D18) -> empirisch
+               bestes Modell unter Budget/VRAM-Nebenbedingung (planner-mcp);
+               zu wenig Daten -> Handregel (Prior).
+             - EXPLORATION: kleiner Anteil der Läufe (z.B. 10%) probiert
+               bewusst ein Alternativmodell, sonst lernt man nie, ob ein
+               anderes besser wäre (Banditen-Prinzip, simpel).
+             - Kaltstart-Schutz: unter Daten-Schwelle NIEMALS Empirie -> kein
+               Wackeln bei dünner Statistik (D18).
+  Beweis:    Künstlich einen Aufgabentyp erzeugen, bei dem Modell B nachweislich
+             besser/billiger ist -> nach genug Datenpunkten routet F2 von der
+             Handregel (A) auf B um, dokumentiert im Trace.
+
+--------------------------------------------------------------------------------
+4. ARCHITEKTUR-DELTA (winzig — der KERN reift, die Oberfläche bleibt)
+--------------------------------------------------------------------------------
+  Schichten aus v1/V2 unverändert. V3 ist fast reiner Querschnitt:
+
+    QUERSCHNITT (neu):
+      resilience.py ........ R1-R4 als Dekoratoren (@with_fallback, @breaker,
+                             @idempotent, @checkpoint) in ALLE FastMCP-Server.
+                             Abhängigkeitsfrei, eine geteilte SQLite (mit
+                             Ledger/Traces).
+      kb-mcp erweitert ..... Collections "playbooks" (G1) + Pflege-Tools
+                             kb_dedup/kb_resolve_conflicts (G2).
+      supervisor erweitert . playbook_lookup beim Start + Reflexions-Schritt
+                             am Ende (G1).
+      eval-runner erweitert  Shadow-Modus + Versionierung/Rollback (F1).
+      model-routing erweitert routing_stats + empirische Wahl + Exploration (F2).
+
+    KEINE neuen Dauer-Dienste. KEINE neuen Kanäle. KEIN OpenClaw-Fork.
+
+--------------------------------------------------------------------------------
+5. UMSETZUNGS-PHASEN 11-13  (je mit Beweis, baut auf abgeschlossenem V2 auf)
+--------------------------------------------------------------------------------
+
+  PHASE 11 — IMMUNSYSTEM  (R1, R2, R3, R4)
+    Voraussetzung: V2 Phase 6-7 (Gates, Ledger, Traces, jobs-mcp) steht.
+    Reihenfolge:   resilience.py zuerst (R1+R2+R3 als Dekoratoren), dann R4
+                   in die Langläufer.
+    BEWEIS-BUNDLE: (a) Ollama-Kill mitten im Turn -> Fallback zu Ende (R1).
+                   (b) research-mcp lahm -> Breaker meldet sofort, heilt nach
+                       5 min (R2).
+                   (c) Mail-Job-Crash+Restart -> genau EINE Mail (R3).
+                   (d) build-bot bei 4/7 abschießen -> Resume ab 5 (R4).
+
+  PHASE 12 — GEDÄCHTNIS  (G1, G2)
+    Voraussetzung: V2:V12 (kb_ingest, learnings-Collection) steht.
+    BEWEIS:        (a) Aufgabentyp zweimal -> Lauf 2 nutzt Playbook, messbar
+                       weniger Planungs-Turns (G1).
+                   (b) Widerspruch einspeisen -> Pflege-Lauf liefert danach die
+                       aktuelle Version korrekt markiert (G2).
+
+  PHASE 13 — FLYWHEEL  (F1, F2)  — der Schlussstein
+    Voraussetzung: V2:V10 (Eval-Suite) + V2:V3 (Trace-Log) mit echten Daten.
+    BEWEIS:        (a) Schlechtere Prompt-Variante -> F1 lehnt ab; bessere ->
+                       übernimmt + taggt + Rollback geprobt (F1).
+                   (b) Konstruierter Aufgabentyp -> F2 routet nach genug Daten
+                       von Handregel auf das belegt bessere Modell um (F2).
+
+--------------------------------------------------------------------------------
+6. DER KONKRETE NÄCHSTE SCHRITT (sofort baubar, ohne Umgebungsdetails)
+--------------------------------------------------------------------------------
+  resilience.py — EIN abhängigkeitsfreies Modul, das du heute Abend laufen lässt,
+  nicht nur liest. Inhalt:
+     - @with_fallback(capability)   Leiter-Logik (R1) + Abstiegs-Grund-Klassen
+     - @breaker(name)               Circuit Breaker closed/open/half-open (R2)
+     - @idempotent(key_fn)          Idempotenz-Ledger, crash-fest (R3)
+     - @checkpoint(job_id)          Schritt-State schreiben/lesen (R4)
+     - eine geteilte SQLite (resilience.db) für Breaker-State, Aktions-Ledger,
+       Checkpoints — gleiche DB-Datei-Konvention wie V2-Ledger/Traces.
+  Einbau:  als Dekoratoren über die Tool-Funktionen deiner FastMCP-Server.
+           Generisch -> braucht KEINE Volume-Namen/Ports, geht sofort.
+
+  => Sag Bescheid, dann liefere ich resilience.py als echten, lauffähigen Code
+     (so wie das Tag-1-Paket aus V2/Addendum §4).
+
+--------------------------------------------------------------------------------
+7. ENTSCHEIDUNGEN, DIE DU BESTÄTIGEN MUSST  (vor Phase 11/13)
+--------------------------------------------------------------------------------
+  D15  Circuit-Breaker-Werte: 3 Fehlschläge -> 5 min Cooldown okay, oder anders?
+  D16  Playbook-Vertrauen: Playbook automatisch als Startplan laden (empfohlen)
+       ODER nur als Vorschlag anzeigen?
+  D17  Auto-Tuning-Autonomie: darf F1 nach klarem Eval-Sieg SELBST übernehmen,
+       oder immer GO? (Empfehlung: Start GO-Pflicht, später Auto für reine
+       Prompt-Tweaks.)
+  D18  Empirisches Routing — Daten-Schwelle: ab wie vielen Läufen je
+       (Aufgabentyp,Modell) darf Empirie die Handregel überschreiben?
+       (Kaltstart-Schutz; Vorschlag: >= 20.)
+  D19  Gedächtnis-Verdichtung: Original archivieren + Verdichtung daneben
+       (empfohlen, reversibel) ODER ersetzen (schlanker, riskanter)?
+
+--------------------------------------------------------------------------------
+8. EHRLICHE ABGRENZUNG
+--------------------------------------------------------------------------------
+  - V3 setzt ABGESCHLOSSENES V2 voraus: ohne Traces kein F2, ohne Eval-Suite
+    kein F1, ohne Gates/Ledger kein sicheres R3. Reihenfolge bleibt: erst Boden.
+  - KEIN Reinforcement-Learning / kein Modell-Training. F1/F2 sind Auswahl &
+    Tuning auf Basis von Messung, nicht Gewichts-Updates. (Das wäre frühestens
+    sinnvoll, wenn die Eval-Suite reif und groß ist — bewusst nicht jetzt.)
+  - KEINE selbst-modifizierende Autonomie ohne Beweis-Gate: F1 ändert nur, was
+    die Eval-Suite deckt, und ist immer rollbackbar. Niemals "das System
+    schreibt sich blind um".
+  - Playbooks sind Vorschlag, nicht Dogma: bei anderer Lage darf abgewichen
+    werden — sonst zementiert man alte Fehler.
+  - Gedächtnis-Pflege löscht NIE hart (G2): immer archivieren + verdichten.
+  - Weiterhin 16 GB VRAM als Planungsgrundlage, ein großes lokales Modell;
+    planner-mcp bleibt der VRAM-Schiedsrichter.
+  - Kein Knowledge-Graph, kein zweiter Rechner, kein Kubernetes — V3 macht den
+    EINEN Kern robust und lernfähig, nicht das Setup größer.
+
+================================================================================
+  ENDE MASTERPLAN V3 — Reihenfolge/Entscheidungen bestätigen,
+  dann resilience.py anfordern (§6) als ersten lauffähigen Baustein.
+================================================================================

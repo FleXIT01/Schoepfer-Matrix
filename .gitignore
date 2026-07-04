@@ -1,0 +1,89 @@
+# ============================================================
+#  SCHOEPFER-MATRIX .gitignore
+#  Grundregel: eigener Code/Skripte/Skills kommen ins Repo,
+#  Secrets, Laufzeit-Daten und Fremd-Repos NIEMALS.
+# ============================================================
+
+# ---- SECRETS (niemals committen!) ----
+secrets.env
+matrix.env
+openclaw.json
+openclaw-full.json
+openclaw-guest.json
+mcp-servers/mail_mcp/mail_account.json
+*.pem
+*.key
+
+# ---- Laufzeit-Zustand & Ausgaben ----
+openclaw-workspace/state/
+openclaw-workspace/output/
+openclaw-workspace/browser-profile/
+openclaw-workspace/agent-workspace/memory/
+openclaw-workspace/agent-workspace/state/
+openclaw-workspace/agent-workspace/.openclaw/
+_backups/
+*.log
+*.db
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+__pycache__/
+*.pyc
+eval/results/
+eval/shadow/
+
+# ---- Fremd-Repos / grosse Vendor-Verzeichnisse (selbst installieren, siehe INSTALL.md) ----
+openclaw-main/
+WeKnora-main/
+ComfyUI_portable/
+piper/
+agent-framework-main/
+agenticSeek-main/
+awesome-main/
+build-your-own-x-master/
+cherry-studio-main/
+clawhub-main/
+coding-interview-university-main/
+CowAgent-master/
+deepwiki-open-main/
+developer-roadmap-master/
+freeCodeCamp-main/
+free-programming-books-main/
+gpt-researcher-main/
+gpt_from_scratch/
+khoj-master/
+knowledge-ingest/
+LangBot-master/
+Langchain-Chatchat-master/
+local-llm-planner/
+MaxKB-2/
+open-webui-main/
+PDFMathTranslate-main/
+project-based-learning-master/
+projekt_für_ollama/
+public-apis-master/
+repo-critic-ai/
+repos/
+shell_gpt-main/
+SuperAGI-main/
+SurfSense-main/
+swarm-main/
+system-design-primer-master/
+Festplatte/
+ai_agent_0/
+bot1/generator/__pycache__/
+
+# ---- Sonstiges ----
+.vscode/
+.claude/
+z_image_universal.log
+*.wav
+
+# verschachtelte Alt-Repos / Duplikate
+.git-disabled-bak/
+bot1/bot1/
+
+# Skill-Backup-Kopien + Demo-Reste + alte Vor-Migrations-Skillkopie
+openclaw-workspace/agent-workspace/skills/.openclaw-install-backups/
+openclaw-workspace/agent-workspace/email_campaign_*
+openclaw-workspace/skills/

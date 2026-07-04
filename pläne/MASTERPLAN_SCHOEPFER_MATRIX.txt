@@ -1,0 +1,532 @@
+================================================================================
+  MASTERPLAN — UNIVERSELLE SCHÖPFER-MATRIX
+  Ein OpenClaw-zentriertes Multi-Agent-Betriebssystem aus allen 36 Repos
+================================================================================
+  Erstellt:        2026-06-06
+  Basis-Pfad:      n:\allinall
+  Zentrales Hirn:  openclaw-main   (OpenClaw 2026.6.2, TypeScript/Node)
+  Status:          PHASE 0-4 UMGESETZT & END-TO-END GETESTET (2026-06-07)
+================================================================================
+
+================================================================================
+  UMSETZUNGS-STATUS (aktualisiert 2026-06-06)
+================================================================================
+  ✅ OpenClaw als Hirn eingerichtet (nicht-interaktiv): lokaler Modus,
+     Provider ollama, Default-Modell ollama/gpt-oss:20b (zuverlässiges Tool-Calling).
+     State: n:\allinall\openclaw-workspace\state\openclaw.json
+  ✅ 8 MCP-Server gebaut (Python/FastMCP) unter n:\allinall\mcp-servers\:
+       science(11) llm(8) factory(3) review(3) planner(3) pdf(3) research(2) knowledge(2)
+       = 35 Tools.  Alle per echtem MCP-Protokoll/Agent getestet.
+  ✅ In OpenClaw registriert + geprobt: `openclaw mcp probe` listet alle 35 Tools.
+  ✅ PHASE 3 — Modell-Routing: llm-MCP routet pro Aufgabe (codestral=Code,
+     qwen3-vl=Bild, qwen2.5:7b=schnell, gpt-oss=Reasoning). Supervisor-Orchestrierung
+     end-to-end getestet (route_model -> code_generate -> echter Code).
+  ✅ KONTEXT-FIX (kritisch): eigenes Ollama-Modell gpt-oss-32k (num_ctx 32768, passt
+     mit 14 GB komplett in die 16 GB GPU) + contextTokens 32768 + reserveTokens 4096.
+     Behebt "Ollama stream ended"/Compaction-Loop bei 32 Tool-Schemas (~10k Tokens).
+  ✅ COMPACTION-FIX (2026-06-09): contextTokens/contextWindow 32768→49152.
+     OpenClaw berechnet reserveTokens = contextTokens/2 (FEST, nicht konfigurierbar).
+     Bei 32768 blieben nur 16384 für Prompt → 44 Tool-Schemas (~12k) + Gespräch
+     sprengten das Budget. Bei 49152 → promptBudget=24576 → ~8k Headroom.
+     Außerdem: reserveTokensFloor 4096→20000, maxTokens 4096→2048.
+     Blockierte Sessions manuell zurückgesetzt. Ollama handhabt dynamischen
+     Kontext; reale Prompts (~17k) bleiben weit unter den echten 32k des Modells.
+  ✅ PHASE 4 — research-MCP (lokale Tiefenrecherche: Zerlegung->DuckDuckGo->Synthese,
+     quellenbelegter Bericht), pdf-MCP (extract/summarize/translate via pypdf+ollama),
+     ComfyUI/SDXL-Bildgenerierung über comfy-Provider END-TO-END bewiesen
+     (`openclaw infer image generate` -> echtes Bild). Launcher comfy.cmd.
+  ✅ Web-Suche: Ad-Filter in web_search (DuckDuckGo y.js/aclick-Treffer raus).
+  ✅ DAUERBETRIEB: gateway.cmd (sauberer Neustart, beendet alte Sitzungen) +
+     Windows-Autostart-Verknüpfung; versteckte Scheduled Task entfernt.
+  ✅ END-TO-END BEWIESEN: Agent-Turn (ollama/gpt-oss:20b) rief science__chembl_search
+     auf und lieferte echte Daten (ASPIRIN CHEMBL25, 180.16 Da). Ebenso
+     science__alphafold_fetch (P00533/EGFR). Kette: Hirn→MCP→API→Daten→Antwort.
+  ✅ 8 OpenClaw-Skills installiert (supervisor, drug-discovery, build-bot,
+     deep-research, repo-review, knowledge-ask, image-create, pdf-tools).
+  ✅ Wissens-Index gebaut (372 Dokumente) + knowledge-mcp durchsucht ihn.
+  ✅ Launcher: gateway.cmd = EIN START FUER ALLES (Ollama + Docker/WeKnora-RAG +
+     BGE-Reranker + Gateway/Bot, in dieser Reihenfolge; RAG ist best-effort).
+     Liegt im Autostart -> startet automatisch beim Login. Nebenbei: matrix.cmd
+     (Einzel-Agent-Turn), comfy.cmd (Bilder), weknora.cmd/rerank.cmd (Einzelstart).
+  ✅ Telegram-Bot @pc_projekt_Bot live + Autostart; Gateway mit neuer Config neu gestartet.
+  ✅ CLOUD-SCHICHT (OpenRouter, hybrid/kostenbewusst — NICHT im Urplan, Bonus):
+     Default-Hirn bleibt lokal & gratis; Cloud nur on-demand via llm-MCP-Tools:
+       cloud_reason / cloud_code -> Claude Sonnet 4.6 (Premium)
+       cloud_cheap               -> DeepSeek v3.2 (~10-15x billiger)
+     End-to-end über Gateway bewiesen. Parallele Cloud-Subagenten vorbereitet
+     (subagents.model=Claude), aber schlummernd (tools.profile="full" nötig;
+     lokaler Dirigent sammelt Ergebnisse unzuverlässig -> nur mit Cloud-Hirn robust).
+  ✅ SICHERHEIT: Telegram auf eigene ID beschränkt (dmPolicy=allowlist,
+     allowFrom=[<deine-id>]); vorher war der Bot für alle offen.
+
+  ✅ AUTO-DOKU: wiki-MCP (Repo -> Architektur-Markdown via AST + Modell), Skill repo-wiki.
+  ✅ 3D-VIZ: molviz-MCP (Proteine PDB/AlphaFold + Moleküle SMILES als interaktives
+     3Dmol.js-HTML, ohne PyMOL-Installation), Skill mol-viz.
+  ✅ VOLL-RAG (WeKnora, Docker — User-Spec): Hybrid Search (Qdrant dense + ParadeDB BM25)
+     + bge-m3-Embedding + BGE-Reranker-v2-m3. Korpus: 7 Docs / 410 Chunks (system-design-primer,
+     build-your-own-x, awesome, project-based-learning, free-programming-books, developer-roadmap,
+     MASTERPLAN). An OpenClaw via schlankem kb-MCP (kb_search/kb_stats). END-TO-END bewiesen
+     (Hirn -> kb_search -> Hybrid+Rerank -> Antwort mit Quelle). Start: automatisch via gateway.cmd.
+  ✅ VERKNÜPFUNG: AGENTS.md enthält einen Werkzeug-Routing-Leitfaden (welches Tool wann/wie:
+     kb_search vs knowledge_search vs research; Cloud nur on-demand cheap->code->reason; science/
+     molviz/pdf/wiki/factory/review/planner). Wird jede Session in den System-Prompt geladen.
+     Unguided-Test bestätigt: Hirn wählt autonom die richtige Quelle. 12 MCP-Server / 44 Tools.
+  ✅ AUSGABE & VERSAND: pdf_create (Markdown/Text -> PDF) + mail-MCP (email_send via
+     Outlook/Gmail-SMTP, telegram_send schickt Dateien direkt in den Chat). Skill
+     report-deliver orchestriert Recherche->PDF->Zustellen. Konto-Umstellung via
+     mailcfg.cmd (Outlook/Gmail). pdf_create+telegram_send END-TO-END bewiesen;
+     E-Mail nach einmaligem mailcfg.cmd aktiv. KEIN Standard-Empfänger (immer angeben).
+
+  ABGLEICH MIT DER ROLLEN-LANDKARTE — was bewusst NICHT (mehr) gebraucht wird:
+   Voll erfüllt: BRAIN, science, factory, review, planner, research, pdf, knowledge,
+   comfy(Bilder), Telegram, Modell-Routing + Cloud, wiki(Auto-Doku), molviz(3D),
+   WeKnora-RAG (Hybrid+Reranker). Der KERN + die Kür stehen.
+   Optional offen (Phase 5 / Nische — diminishing returns):
+   - clawhub (Skill-Marktplatz) + deepwiki — Phase 5 (wiki-MCP deckt Auto-Doku bereits ab).
+   - agenticSeek / SuperAGI (alt. Coder) — factory-mcp + cloud_code decken das ab.
+   - Foldseek (Struktur-SUCHE), projekt_für_ollama/Chimera (Steering) — Nische.
+   - SurfSense (Web-Sammler) — OpenClaw-Native-Suche + research-mcp decken das ab.
+   - WeKnora-Korpus weiter erweitern: 7 Docs/410 Chunks indexiert, weitere Repos bulk-nachladbar.
+   Bewusst ignoriert (REDUNDANT): cherry-studio, open-webui, shell_gpt, khoj,
+   LangBot, CowAgent, Langchain-Chatchat. REFERENZ-Repos: swarm, agent-framework,
+   ai_agent_0, gpt_from_scratch (Vorlagen, keine Dienste).
+   Hardware-Realität: VRAM 16 GB -> nur EIN großes lokales Modell gleichzeitig.
+================================================================================
+
+
+--------------------------------------------------------------------------------
+0. KURZFASSUNG (TL;DR)
+--------------------------------------------------------------------------------
+
+Deine Intuition ist korrekt: OpenClaw ist das richtige zentrale Hirn.
+
+Grund: OpenClaw ist KEIN kleines Tool, sondern eine vollständige, produktionsreife
+Agent-Plattform mit ~130 Extensions und ~70 Skills. Es bringt bereits mit:
+  - JEDEN LLM-Provider (anthropic, openai, ollama, deepseek, qwen, mistral,
+    google, groq, together, openrouter, lmstudio, vllm, litellm, ...)
+  - JEDEN Messenger-Kanal (Telegram, Discord, Slack, Signal,
+    iMessage, WeChat, Matrix, Teams, ...)
+  - Browser-Steuerung (extensions/browser)
+  - Bild/Video/Voice (comfy, fal, runway, pixverse, elevenlabs, deepgram)
+  - Web-Suche (duckduckgo, brave, exa, tavily, perplexity, firecrawl, searxng)
+  - Coding-Agenten (codex, opencode, kilocode + skill "coding-agent")
+  - Memory (active-memory, memory-lancedb, memory-wiki)
+  - MCP-Host (skill "mcporter", plugin-sdk) + Canvas (Live-UI)
+  - Skill-Selbstbau (skill "skill-creator") + Marktplatz (skill "clawhub")
+  - Agent-Harness + Sub-Agenten (packages: agent-core, acp-core, codex-supervisor)
+
+=> Wir bauen NICHTS davon nach. Wir machen OpenClaw zum Gehirn und hängen nur
+   das an, was OpenClaw NICHT hat. Das einzig wirklich Einzigartige in deinen
+   lokalen Repos ist:
+     (A) die WISSENSCHAFTS-APIs (AlphaFold, ChEMBL, PubMed, Ensembl, STRING,
+         Reactome, openFDA, RCSB-PDB, arXiv, OpenAlex, EuropePMC)
+     (B) die BOT-FABRIK aus bot1 (Architect->Coder->Gates->Fixer mit echter
+         Verifikation in einer Sandbox)
+     (C) ein paar Spezialdienste (gpt-researcher, repo-critic-ai, deepwiki,
+         PDFMathTranslate, local-llm-planner)
+
+Die 4 Verbindungs-Mechanismen (genau diese, nichts anderes):
+  1. NATIVE EXTENSION   -> schon in OpenClaw vorhanden, nur konfigurieren
+  2. MCP-SERVER         -> eigener Tool-Server (Python), den OpenClaw via
+                           "mcporter" / lokalem MCP-Modus konsumiert  [HAUPTWEG]
+  3. OPENCLAW-SKILL     -> SKILL.md-Workflow, der MCP-Tools/Services orchestriert
+  4. HTTP-SERVICE       -> schwerer lokaler Dienst, von Skill/MCP per HTTP gerufen
+
+Wie "das Richtige je Aufgabe gewählt wird":
+  OpenClaws Agent-Loop liest die `description` jedes Skills und das Schema jedes
+  MCP-Tools und WÄHLT SELBST anhand dieser Beschreibungen. D.h. das Routing
+  entsteht NICHT durch eine if/else-Kette (wie aktuell in bot1/start.py), sondern
+  durch präzise Skill-Beschreibungen + Tool-Schemas + einen "Supervisor"-Skill
+  für die Mehr-Agenten-Zerlegung.
+
+
+--------------------------------------------------------------------------------
+1. IST-ZUSTAND (was heute wirklich da ist)
+--------------------------------------------------------------------------------
+
+bot1 (Python) ist heute der De-facto-Orchestrator. Er hat:
+  - start.py: interaktiver Agent + worldloop + serve + grill + status + heal
+  - TaskAgent (ReAct, 21 Tools), ScienceAgent (Bio-Pipeline)
+  - ServiceRegistry + Service-Bridges (HttpService) für ~17 Dienste
+  - 11 echte, live getestete Wissenschafts-API-Tools
+  - Completion-Gate + echte Web-Suche (kürzlich repariert)
+
+PROBLEM mit dem Ist-Zustand:
+  - bot1 ERFINDET Routing/Channels/Memory/Multi-Provider NEU — alles Dinge,
+    die OpenClaw schon besser kann.
+  - Die "openclaw_service.py"-Bridge startet NICHT das echte OpenClaw, sondern
+    einen Python-Fake (openclaw_bridge.py) mit eigenem Intent-Prompt. OpenClaws
+    eigentliche Stärke (Gateway, Channels, Skills, MCP) bleibt ungenutzt.
+  - Viele Service-Bridges zeigen auf Dienste, die nie laufen (Stub-Verhalten).
+
+=> Strategiewechsel: bot1 wird vom "Hirn" zum "Werkzeugkasten hinter MCP".
+   OpenClaw wird das echte Hirn.
+
+
+--------------------------------------------------------------------------------
+2. ZIEL-ARCHITEKTUR (5 Schichten)
+--------------------------------------------------------------------------------
+
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │ SCHICHT 5 — GESICHTER / KANÄLE   (OpenClaw nativ)                      │
+  │   Telegram · Discord · Slack · Signal · iMessage · WebChat · CLI       │
+  │   · Canvas (Live-UI) · Voice-Call · CLI                                │
+  ├─────────────────────────────────────────────────────────────────────┤
+  │ SCHICHT 4 — HIRN / GATEWAY   (openclaw-main)                           │
+  │   agent-core (Reasoning-Loop) · model-catalog (Modellwahl je Task)     │
+  │   · Skill-Router (wählt per description) · MCP-Host · Memory           │
+  │   · codex-supervisor (Mehr-Agenten-Zerlegung) · net-policy (Security)  │
+  ├─────────────────────────────────────────────────────────────────────┤
+  │ SCHICHT 3 — SKILLS   (Workflows als SKILL.md)                          │
+  │   supervisor · drug-discovery · deep-research · build-bot ·            │
+  │   repo-review · paper-translate · repo-to-wiki · knowledge-ask         │
+  ├─────────────────────────────────────────────────────────────────────┤
+  │ SCHICHT 2 — MCP-SERVER   (eigene Tool-Server, Python)                  │
+  │   science-mcp (11 Bio-APIs) · factory-mcp (bot1-Fabrik) ·              │
+  │   research-mcp (gpt-researcher) · review-mcp (repo-critic-ai) ·        │
+  │   planner-mcp (local-llm-planner) · pdf-mcp (PDFMathTranslate)         │
+  ├─────────────────────────────────────────────────────────────────────┤
+  │ SCHICHT 1 — SCHWERE DIENSTE / DATEN   (HTTP/Docker + Korpus)           │
+  │   ComfyUI · MaxKB/WeKnora/Chatchat (RAG) · agenticSeek · SuperAGI ·    │
+  │   Wissens-Repos (awesome, freeCodeCamp, roadmaps, ...) als Korpus      │
+  └─────────────────────────────────────────────────────────────────────┘
+
+Datenfluss (Beispiel "Baue Android-App zur Protein-Faltungserkennung"):
+  Telegram-Nachricht
+   -> OpenClaw Gateway (Schicht 5/4)
+   -> agent-core erkennt komplexes Ziel -> ruft Skill "supervisor"
+   -> supervisor zerlegt in: [recherche] [molekül-daten] [mockup] [code] [review] [deploy] [doku]
+   -> recherche  : MCP science-mcp.pubmed_search + research-mcp.deep_research
+   -> molekül    : MCP science-mcp.alphafold_fetch / rcsb_pdb / chembl
+   -> mockup     : native extension "comfy" (-> ComfyUI Schicht 1)
+   -> code       : skill "coding-agent" (-> codex/claude-code) ODER factory-mcp
+   -> review     : MCP review-mcp (repo-critic-ai) + native "browser" zum Testen
+   -> deploy     : skill "build-bot"/shell + (firebase/android CLI)
+   -> doku       : skill "repo-to-wiki" (-> deepwiki)
+   -> Ergebnis (APK + Bericht) zurück über Telegram (Schicht 5)
+
+
+--------------------------------------------------------------------------------
+3. ROLLEN-LANDKARTE — JEDES REPO GENAU ZUGEORDNET
+--------------------------------------------------------------------------------
+Legende der Mechanismen:  [BRAIN] [NATIVE] [MCP] [SKILL] [HTTP] [KORPUS]
+                          [REDUNDANT=OpenClaw kann es schon] [REFERENZ]
+
+# Kern / Hirn
+  openclaw-main ............. [BRAIN]   Gateway, Agent-Loop, Skills, MCP-Host,
+                                        Channels, Memory, Modellwahl. Alles läuft
+                                        hier zusammen. ECHTES OpenClaw starten
+                                        (Node), nicht den Python-Fake.
+  bot1 ...................... [MCP]     Wird zur "factory-mcp": Bot-Generator
+                                        (Architect/Coder/Gates/Fixer) + die 11
+                                        Science-Tools als "science-mcp".
+                                        start.py-Routing wird NICHT mehr Hirn.
+  clawhub-main .............. [HTTP]    Backend für den Skill-Marktplatz
+                                        (OpenClaw-Skill "clawhub" ist der Client).
+  ai_agent_0 ............... [REFERENZ] "Ollama+OpenClaw+Web+GUI" — Vorlage/Beispiel
+                                        für die lokale Verdrahtung, kein eigener Dienst.
+
+# Wissenschaft  (DAS ALLEINSTELLUNGSMERKMAL -> science-mcp)
+  bot1/.../tools/impl/*  .... [MCP]     arxiv, openalex, pubmed, europepmc,
+                                        alphafold, rcsb_pdb, chembl, string_db,
+                                        ensembl, reactome, openfda
+                                        => 1 MCP-Server "science-mcp" mit 11 Tools.
+  (PyMOL/Foldseek) ......... [HTTP]    Optional: 3D-Visualisierung als Dienst,
+                                        später; nicht für Phase 1.
+
+# Recherche / Wissen
+  gpt-researcher-main ...... [MCP/HTTP] Tiefe Multi-Quellen-Recherche-Pipeline
+                                        -> "research-mcp" (deep_research(query)).
+  SurfSense-main ........... [HTTP]    Web-Daten-Sammler; optional, da OpenClaw
+                                        exa/tavily/firecrawl nativ hat. Nur falls
+                                        spezielle Sammel-Workflows gebraucht werden.
+  MaxKB-2 .................. [HTTP]    RAG-Wissensdatenbank (Docker). Backend für
+                                        Langzeitwissen. OpenClaw memory-* ist der
+                                        primäre Speicher; MaxKB für große Korpora.
+  WeKnora-main ............. [HTTP]    Alternative RAG-Engine; EINE wählen
+                                        (Empfehlung: MaxKB ODER WeKnora, nicht beide).
+  Langchain-Chatchat-master  [HTTP]    Weitere RAG-Option -> REDUNDANT zu MaxKB,
+                                        nur als Fallback/Vergleich behalten.
+  khoj-master .............. [REDUNDANT] Persönliche Wissens-Suche; OpenClaw
+                                        memory-wiki/active-memory deckt das ab.
+  deepwiki-open-main ....... [MCP/HTTP] Repo -> interaktive Architektur-Wiki
+                                        -> Skill "repo-to-wiki".
+  PDFMathTranslate-main .... [MCP]     PDF (mit Formeln) übersetzen -> "pdf-mcp".
+
+# Software-Fabrik / Coding
+  agenticSeek-main ......... [MCP/HTTP] "Lokales Manus": autonomer lokaler Coder
+                                        -> optionaler Coding-Worker (MCP), wenn
+                                        man nicht codex/claude-code nutzen will.
+  repo-critic-ai ........... [MCP]     Harter Code-Reviewer -> "review-mcp"
+                                        (scan_repo(path) -> Findings).
+  SuperAGI-main ............ [HTTP]    Autonomes Multi-Agent-Framework — optional
+                                        als externer Agenten-Pool; OpenClaw
+                                        codex-supervisor/acp-core ist primär.
+  swarm-main ............... [REFERENZ] OpenAI-Swarm-Muster (Handoffs) — Konzept-
+                                        Vorlage für den supervisor-Skill, kein Dienst.
+  agent-framework-main ..... [REFERENZ] Microsoft Agent Framework — Vorlage für
+                                        Sub-Agent-Patterns, kein Dienst.
+  bot1 (Fabrik) ............ [MCP]     siehe oben "factory-mcp": baut & VERIFIZIERT
+                                        ganze Bot-Pakete in einer Sandbox.
+
+# Welt-Interaktion / UI  (überwiegend schon in OpenClaw)
+  ComfyUI_portable ......... [HTTP]    Bild-Backend; OpenClaw "comfy"-Extension
+                                        verbindet sich damit (Port 8188).
+  (Browser) ................ [NATIVE]  extensions/browser — KEIN eigenes Playwright
+                                        nötig. browser_control.py wird überflüssig.
+  cherry-studio-main ....... [REDUNDANT] Desktop-LLM-UI; OpenClaw + Canvas ersetzt.
+  open-webui-main .......... [REDUNDANT] Web-Chat-UI; OpenClaw WebChat ersetzt.
+  shell_gpt-main ........... [REDUNDANT] Terminal-LLM; OpenClaw CLI/skills ersetzt.
+
+# Messenger  (KOMPLETT REDUNDANT — OpenClaw kann all das nativ)
+  LangBot-master ........... [REDUNDANT] Discord/Slack/Telegram/WeChat -> native
+                                        OpenClaw-Channels nutzen.
+  CowAgent-master .......... [REDUNDANT] Messenger-Bot -> native OpenClaw-Channels.
+
+# Hardware / LLM-Steuerung
+  local-llm-planner ........ [MCP]     VRAM/GPU-Monitor -> "planner-mcp"
+                                        (resources(), can_load(model)). Hilft
+                                        OpenClaw bei der lokalen Modellwahl.
+  projekt_für_ollama ....... [MCP]     "Chimera": Steering/Abliteration — Nische,
+                                        optionaler MCP für Spezialfälle.
+  gpt_from_scratch ......... [REFERENZ] Mini-Modell-Training — Forschungs-Referenz.
+
+# Reines Wissen / Lern-Korpus  (-> in RAG indexieren, KEIN Dienst)
+  awesome-main ............. [KORPUS]
+  free-programming-books-main [KORPUS]
+  freeCodeCamp-main ........ [KORPUS]
+  project-based-learning-master [KORPUS]
+  build-your-own-x-master .. [KORPUS]   (zusätzlich: Vorlagen für die Bot-Fabrik)
+  coding-interview-university-main [KORPUS]
+  developer-roadmap-master . [KORPUS]
+  system-design-primer-master [KORPUS]  (Architektur-Wissen für PLAN-Phase)
+  public-apis-master ....... [KORPUS]   (API-Katalog für CODE-Phase)
+   => Alle in EINE Wissensbasis (MaxKB/WeKnora) indexieren; per Skill
+      "knowledge-ask" abfragbar. system-design-primer + public-apis werden
+      gezielt in der Planungs-/Codingphase herangezogen.
+
+  Festplatte ............... [IGNORE]  vermutlich Ablage/kein Projekt.
+
+
+--------------------------------------------------------------------------------
+4. WIE "DAS RICHTIGE" GEWÄHLT WIRD  (das Routing-Modell, genau)
+--------------------------------------------------------------------------------
+
+Es gibt KEINE zentrale if/else-Routingdatei mehr. Stattdessen 3 Ebenen:
+
+A) WERKZEUG-EBENE (innerhalb einer Aufgabe):
+   OpenClaws agent-core bekommt alle MCP-Tool-Schemas + Skills sichtbar gemacht.
+   Die `description` + `input_schema` SIND der Router. Deshalb gilt:
+   REGEL: Jedes MCP-Tool und jeder Skill braucht eine präzise, trigger-orientierte
+   Beschreibung (Substantiv-Phrase, klare Stichworte). Beispiel:
+     science-mcp.alphafold_fetch:
+       "3D-Struktur eines Proteins aus AlphaFold per UniProt-ID. Für: Proteinform,
+        Domänen, Strukturbiologie."
+   So wählt das Modell alphafold_fetch automatisch, sobald es um Proteinstruktur geht.
+
+B) AUFGABEN-EBENE (welcher Skill/Workflow):
+   Skills sind grobgranulare Workflows. Ihre `description` triggert sie. Beispiel:
+     drug-discovery: "Wirkstoffe/Targets gegen eine Krankheit finden: Literatur,
+       Moleküle, Targets, Struktur, Bericht."
+   Das Modell erkennt "finde Inhibitoren gegen X" -> Skill drug-discovery.
+
+C) ZERLEGUNGS-EBENE (mehrere Agenten parallel):
+   Ein Meta-Skill "supervisor" (Muster aus swarm/agent-framework) zerlegt ein
+   großes Ziel in Teilaufgaben, ordnet jeder Teilaufgabe einen Skill/MCP-Tool zu,
+   führt unabhängige Teile PARALLEL aus (codex-supervisor / acp-core) und fügt
+   die Ergebnisse zusammen. Entscheidungslogik im supervisor:
+     - Zähle benötigte Fähigkeiten (Recherche? Code? Bild? Deploy?).
+     - 1 Fähigkeit  -> direkter Skill/Tool-Aufruf (kein Overhead).
+     - >1 Fähigkeit -> Teilaufgaben-Graph; unabhängige Knoten parallel.
+     - Code-Aufgaben immer mit anschließendem review-mcp-Gate.
+
+D) MODELL-WAHL je Teilaufgabe (model-catalog-core):
+   - Routing/Klassifikation/kurze Schritte -> kleines lokales Modell (ollama,
+     z.B. qwen2.5:14b) = billig/schnell.
+   - Synthese/Code/Reasoning -> stärkstes verfügbares Modell (anthropic/openai
+     wenn Key vorhanden, sonst größtes lokales).
+   - local-llm-planner (planner-mcp) sagt, was in den VRAM passt.
+
+WICHTIGE LEHRE aus bot1: kleine Modelle VERWEIGERN oder HALLUZINIEREN. Deshalb
+gilt systemweit das "Completion-Gate"-Prinzip auch in OpenClaw-Skills:
+behaupteten Erfolg gegen die Realität prüfen (Datei existiert? Build grün?
+Review bestanden?) bevor "fertig" gemeldet wird.
+
+
+--------------------------------------------------------------------------------
+5. ZU BAUENDE KOMPONENTEN  (genaue Spezifikation)
+--------------------------------------------------------------------------------
+
+5.1  science-mcp   (höchste Priorität — das Alleinstellungsmerkmal)
+   Form:  Python-MCP-Server (stdio + optional HTTP), nutzt die schon
+          existierenden, getesteten Funktionen aus
+          bot1/generator/agent/tools/impl/.
+   Tools (11): arxiv_search, openalex_search, pubmed_search, europepmc_search,
+          alphafold_fetch, rcsb_pdb, chembl_search, string_db, ensembl_lookup,
+          reactome_search, openfda_search.
+   Anbindung: in OpenClaw via `mcporter` registrieren (lokaler MCP-Modus).
+   Aufwand:  niedrig — die Tool-Logik ist fertig, nur MCP-Hülle drumherum.
+
+5.2  factory-mcp   (die Bot-Fabrik aus bot1)
+   Tools: build_bot(spec)->Paket+BUILD_REPORT, plan_tools(spec),
+          verify_package(path).
+   Wert:  echte Sandbox-Verifikation (Import/Smoke/Tool-Gates) — das hat
+          OpenClaws coding-agent so nicht.
+   Anbindung: MCP. Der Skill "build-bot" ruft diese Tools.
+
+5.3  research-mcp   (gpt-researcher)
+   Tools: deep_research(query, depth)->Bericht mit Quellen.
+   Anbindung: MCP-Wrapper um gpt-researcher (läuft als HTTP-Dienst dahinter).
+
+5.4  review-mcp   (repo-critic-ai)
+   Tools: scan_repo(path)->Findings(severity, file, line, msg).
+   Einsatz: Pflicht-Gate nach jeder Code-Generierung.
+
+5.5  planner-mcp   (local-llm-planner)
+   Tools: resources(), can_load(model), recommend(task).
+   Einsatz: OpenClaw fragt vor schweren Schritten (ComfyUI/großes Modell).
+
+5.6  pdf-mcp   (PDFMathTranslate)   — optional Phase 2
+   Tools: translate_pdf(path, target_lang)->übersetztes PDF.
+
+5.7  Skills (SKILL.md-Workflows in OpenClaws skills/ bzw. Workspace):
+   - supervisor ....... Zerlegung + Mehr-Agenten-Orchestrierung (Kern!)
+   - drug-discovery ... Krankheit/Target -> Literatur+Moleküle+Struktur+Bericht
+                        (ruft science-mcp + research-mcp)
+   - deep-research .... Thema -> umfassender Bericht (research-mcp + Suche + memory)
+   - build-bot ........ Spezifikation -> verifiziertes Bot-Paket (factory-mcp
+                        + coding-agent + review-mcp)
+   - repo-review ...... Repo -> Review-Bericht (review-mcp + browser-Test)
+   - repo-to-wiki ..... Repo -> Architektur-Wiki (deepwiki)
+   - paper-translate .. PDF -> Übersetzung (pdf-mcp)
+   - knowledge-ask .... Frage -> Antwort aus dem Lern-Korpus (MaxKB/WeKnora)
+   Jeder Skill: knappe `description` (Trigger), Body = Schritte, `requires` =
+   benötigte Bins/MCP/Config. skill-creator hilft beim Anlegen.
+
+5.8  Wissens-Ingestion (einmalig + inkrementell):
+   - Skript indexiert die [KORPUS]-Repos in MaxKB/WeKnora.
+   - "Lerneffekt": Ergebnisse abgeschlossener Aufgaben (Berichte, Reviews,
+     Builds) zurück in die Wissensbasis schreiben (wie der heutige
+     _ingest_cycle_learnings, aber nach OpenClaw-memory + RAG).
+
+
+--------------------------------------------------------------------------------
+6. ROUTING-KATALOG  (Aufgabe -> Pipeline; durchgerechnete Beispiele)
+--------------------------------------------------------------------------------
+
+"Finde Inhibitoren für EGFR bei Lungenkrebs"
+  -> Skill drug-discovery
+  -> science-mcp.chembl_search(target) + .pubmed_search + .europepmc_search
+     + .alphafold_fetch(EGFR=P00533) + .string_db(EGFR) + .reactome_search
+  -> Synthese (starkes Modell) -> Bericht -> memory + Antwortkanal.
+
+"Suche Infos über X und speichere als txt"
+  -> direkter Tool-Pfad (1 Fähigkeit): native Suche (duckduckgo/exa)
+     -> Datei schreiben -> Completion-Gate (Datei existiert?) -> fertig.
+
+"Baue eine Android-App zur Protein-Faltungserkennung"
+  -> Skill supervisor (mehrere Fähigkeiten)
+  -> [recherche: science-mcp+research-mcp] [mockup: comfy] [code: coding-agent
+     /factory-mcp] [review: review-mcp + browser] [deploy: build-bot/shell]
+     [doku: repo-to-wiki] -> APK + Bericht zurück.
+
+"Übersetze dieses Paper (PDF) und fasse es zusammen"
+  -> Skill paper-translate (pdf-mcp) -> Skill summarize (nativ) -> Antwort.
+
+"Reviewe mein Repo und bau eine Doku-Webseite"
+  -> supervisor: review-mcp (parallel) + repo-to-wiki (parallel) -> Zusammenführung.
+
+"Wie entwerfe ich ein skalierbares Chat-System?"
+  -> Skill knowledge-ask -> RAG über system-design-primer (Korpus) -> Antwort.
+
+
+--------------------------------------------------------------------------------
+7. UMSETZUNGS-PHASEN  (abhängigkeitssortiert)
+--------------------------------------------------------------------------------
+
+PHASE 0 — OpenClaw echt zum Laufen bringen   (Fundament)
+  - `openclaw onboard` ausführen: Gateway + Workspace + 1 Channel (z.B. Telegram
+    oder WebChat) + Provider (ollama lokal + optional anthropic/openai-Key).
+  - Verifizieren: OpenClaw antwortet über einen Channel.
+  - Ergebnis: das echte Hirn lebt (statt Python-Fake).
+
+PHASE 1 — science-mcp anbinden   (sofortiger einzigartiger Mehrwert)
+  - MCP-Server um die 11 fertigen Science-Tools bauen.
+  - via mcporter in OpenClaw registrieren.
+  - Test: "Hol die AlphaFold-Struktur von EGFR" über einen Channel.
+
+PHASE 2 — Kern-Skills + factory-mcp + review-mcp
+  - Skills drug-discovery, deep-research, build-bot, repo-review anlegen.
+  - factory-mcp (bot1-Fabrik) + review-mcp (repo-critic-ai) als MCP.
+  - Test: kompletter Bot-Build mit Verifikation über einen Channel.
+
+PHASE 3 — supervisor (Mehr-Agenten) + Modellwahl
+  - supervisor-Skill (Zerlegung, Parallelität, Gates).
+  - model-catalog: kleines Modell fürs Routing, großes für Synthese/Code.
+  - planner-mcp für lokale VRAM-Entscheidungen.
+  - Test: "Baue Android-App ..." Ende-zu-Ende mit mehreren Agenten.
+
+PHASE 4 — Wissen + Medien + Deployment
+  - Korpus-Repos in MaxKB/WeKnora indexieren; knowledge-ask-Skill.
+  - comfy (ComfyUI) + Voice/Video-Extensions aktivieren.
+  - Deploy-Wege (firebase/android/docker) als Skill-Schritte.
+
+PHASE 5 — Selbstverbesserung + Marktplatz
+  - skill-creator nutzen: das System baut neue Skills für wiederkehrende Abläufe.
+  - clawhub: fertige Skills registrieren/teilen.
+  - repo-to-wiki + deepwiki für automatische Doku.
+
+
+--------------------------------------------------------------------------------
+8. VERZEICHNIS-/DATEI-LAYOUT der Integration  (Vorschlag, neu)
+--------------------------------------------------------------------------------
+  n:\allinall\
+    mcp-servers\
+      science_mcp\        (MCP-Hülle um bot1/.../tools/impl)
+      factory_mcp\        (MCP-Hülle um bot1-Orchestrator)
+      research_mcp\       (Wrapper um gpt-researcher)
+      review_mcp\         (Wrapper um repo-critic-ai)
+      planner_mcp\        (Wrapper um local-llm-planner)
+      pdf_mcp\            (Wrapper um PDFMathTranslate)
+    openclaw-workspace\   (von `openclaw onboard` erzeugt)
+      skills\
+        supervisor\ drug-discovery\ deep-research\ build-bot\
+        repo-review\ repo-to-wiki\ paper-translate\ knowledge-ask\
+      mcp.json            (Registrierung aller mcp-servers)
+    knowledge-ingest\     (Skript: Korpus-Repos -> MaxKB/WeKnora)
+  (bot1 bleibt, wird aber nur noch von science_mcp/factory_mcp importiert,
+   nicht mehr als eigenständiges "Hirn" gestartet.)
+
+
+--------------------------------------------------------------------------------
+9. ENTSCHEIDUNGEN, DIE DU BESTÄTIGEN MUSST  (vor Phase 0)
+--------------------------------------------------------------------------------
+  D1) OpenClaw als echtes Node-Gateway betreiben (empfohlen) — JA/NEIN?
+      Alternative: beim Python-bot1 als Hirn bleiben (schwächer).
+  D2) RAG-Backend: MaxKB ODER WeKnora ODER Chatchat? (Empfehlung: MaxKB)
+  D3) Coding-Worker: OpenClaw coding-agent (codex/claude-code) ODER lokal
+      agenticSeek ODER bot1-factory-mcp? (Empfehlung: factory-mcp für
+      verifizierte Bots, coding-agent für freie Edits.)
+  D4) Channel für Phase 0: WebChat (einfachste) oder Telegram?
+  D5) LLM-Strategie: nur lokal (ollama) oder Cloud-Keys (anthropic/openai)
+      für die schweren Reasoning-/Code-Schritte erlauben?
+  D6) Redundante Repos (LangBot, CowAgent, cherry-studio, open-webui,
+      shell_gpt, khoj) — archivieren/ignorieren? (Empfehlung: ignorieren,
+      nicht löschen.)
+
+
+--------------------------------------------------------------------------------
+10. WAS BEWUSST NICHT GETAN WIRD  (ehrliche Abgrenzung)
+--------------------------------------------------------------------------------
+  - KEIN Nachbau von Browser/Suche/Channels/Memory/Multi-Provider in Python —
+    OpenClaw kann das besser. (browser_control.py, web_search.py, die Messenger-
+    Bridges werden dadurch überflüssig.)
+  - KEINE Garantie für firebase/android/PyMOL/Foldseek ohne lokal installierte
+    SDKs/Programme — diese Schritte sind echte externe Abhängigkeiten.
+  - KEINE Behauptung, dass schwere Dienste (MaxKB, ComfyUI, SuperAGI,
+    agenticSeek) "von allein" laufen — sie müssen je einmal eingerichtet werden;
+    bis dahin degradieren die zugehörigen Skills sichtbar (kein Fake-Erfolg).
+
+================================================================================
+  ENDE DES MASTERPLANS — bereit für dein GO zu Phase 0
+================================================================================

@@ -1,0 +1,158 @@
+{
+  "saved": "20260704-115915",
+  "model": "gpt-oss-32k",
+  "cases": {
+    "g01-route-code": {
+      "status": "pass",
+      "tools": [
+        "llm__route_model"
+      ]
+    },
+    "g02-route-vision": {
+      "status": "pass",
+      "tools": [
+        "llm__route_model"
+      ]
+    },
+    "g03-code-generate": {
+      "status": "pass",
+      "tools": [
+        "llm__code_generate"
+      ]
+    },
+    "g04-budget": {
+      "status": "pass",
+      "tools": [
+        "llm__budget_status"
+      ]
+    },
+    "g05-system-status": {
+      "status": "pass",
+      "tools": [
+        "status__system_status"
+      ]
+    },
+    "g06-resources": {
+      "status": "pass",
+      "tools": [
+        "planner__get_resources"
+      ]
+    },
+    "g07-can-load": {
+      "status": "pass",
+      "tools": [
+        "planner__get_resources"
+      ]
+    },
+    "g08-view-trace": {
+      "status": "pass",
+      "tools": [
+        "trace__view_trace"
+      ]
+    },
+    "g09-trace-stats": {
+      "status": "pass",
+      "tools": [
+        "trace__trace_stats"
+      ]
+    },
+    "g10-step-bottleneck": {
+      "status": "pass",
+      "tools": [
+        "trace__step_stats"
+      ]
+    },
+    "g11-kb-search": {
+      "status": "pass",
+      "tools": [
+        "kb__kb_search"
+      ]
+    },
+    "g12-playbook": {
+      "status": "pass",
+      "tools": [
+        "kb__playbook_lookup"
+      ]
+    },
+    "g13-pdf-create": {
+      "status": "pass",
+      "tools": [
+        "pdf__pdf_create"
+      ]
+    },
+    "g14-web-lookup": {
+      "status": "pass",
+      "tools": [
+        "research__web_lookup"
+      ]
+    },
+    "g15-deep-research": {
+      "status": "pass",
+      "tools": [
+        "assistant__research_pdf_send"
+      ]
+    },
+    "g16-run-command": {
+      "status": "pass",
+      "tools": [
+        "assistant__run_command"
+      ]
+    },
+    "g17-open-app": {
+      "status": "pass",
+      "tools": [
+        "assistant__run_command"
+      ]
+    },
+    "g18-screenshot": {
+      "status": "pass",
+      "tools": [
+        "planner__can_load"
+      ]
+    },
+    "g19-telegram": {
+      "status": "pass",
+      "tools": [
+        "mail__telegram_send"
+      ]
+    },
+    "g20-email": {
+      "status": "pass",
+      "tools": [
+        "mail__email_send"
+      ]
+    },
+    "g21-profile": {
+      "status": "pass",
+      "tools": [
+        "profile__profile_list"
+      ]
+    },
+    "g22-research-pdf-send": {
+      "status": "pass",
+      "tools": [
+        "assistant__research_pdf_send"
+      ]
+    },
+    "g23-trivial-no-cloud": {
+      "status": "pass",
+      "tools": []
+    },
+    "g24-german-direct": {
+      "status": "pass",
+      "tools": []
+    },
+    "g25-backup": {
+      "status": "pass",
+      "tools": [
+        "assistant__backup_now"
+      ]
+    },
+    "g26-backup-natural": {
+      "status": "pass",
+      "tools": [
+        "assistant__backup_now"
+      ]
+    }
+  }
+}

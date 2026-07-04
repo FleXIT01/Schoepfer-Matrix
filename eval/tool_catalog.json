@@ -1,0 +1,2801 @@
+{
+  "generated": "2026-07-04T13:49:31",
+  "servers_ok": 24,
+  "servers_total": 24,
+  "active_tools": 127,
+  "tools": [
+    {
+      "server": "science",
+      "name": "science__arxiv_search",
+      "bare_name": "arxiv_search",
+      "description": "Wissenschaftliche Paper auf arXiv suchen (KI, Physik, Biologie, Mathematik).\nFür: Preprints, neueste Methoden, technische Grundlagen.",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "max_results": {
+            "default": 5,
+            "title": "Max Results",
+            "type": "integer"
+          },
+          "category": {
+            "default": "",
+            "title": "Category",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "arxiv_searchArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "science",
+      "name": "science__openalex_search",
+      "bare_name": "openalex_search",
+      "description": "250M+ wissenschaftliche Werke in OpenAlex durchsuchen (alle Disziplinen),\nmit Zitationszahlen. Für: breite Literatur-Übersicht, Impact-Einschätzung.",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "max_results": {
+            "default": 5,
+            "title": "Max Results",
+            "type": "integer"
+          },
+          "filter_year": {
+            "default": 0,
+            "title": "Filter Year",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "openalex_searchArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "science",
+      "name": "science__pubmed_search",
+      "bare_name": "pubmed_search",
+      "description": "35M+ medizinische/biologische Paper in PubMed/NCBI mit Abstracts.\nFür: klinische Forschung, Medizin, Molekularbiologie.",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "max_results": {
+            "default": 5,
+            "title": "Max Results",
+            "type": "integer"
+          },
+          "filter": {
+            "default": "",
+            "title": "Filter",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "pubmed_searchArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "science",
+      "name": "science__europepmc_search",
+      "bare_name": "europepmc_search",
+      "description": "Biomedizinische Literatur UND Preprints (bioRxiv/medRxiv) über Europe PMC.\nFür: allerneueste, teils unveröffentlichte Forschung.",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "max_results": {
+            "default": 5,
+            "title": "Max Results",
+            "type": "integer"
+          },
+          "preprints_only": {
+            "default": false,
+            "title": "Preprints Only",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "europepmc_searchArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "science",
+      "name": "science__alphafold_fetch",
+      "bare_name": "alphafold_fetch",
+      "description": "Vorhergesagte 3D-Proteinstruktur aus AlphaFold per UniProt-ID (z.B. P00533=EGFR).\nFür: Proteinform, Domänen, Strukturbiologie.",
+      "input_schema": {
+        "properties": {
+          "uniprot_id": {
+            "title": "Uniprot Id",
+            "type": "string"
+          },
+          "include_pdb_url": {
+            "default": true,
+            "title": "Include Pdb Url",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "uniprot_id"
+        ],
+        "title": "alphafold_fetchArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "science",
+      "name": "science__rcsb_pdb",
+      "bare_name": "rcsb_pdb",
+      "description": "Experimentell bestimmte 3D-Strukturen (Röntgen/Kryo-EM/NMR) in der RCSB PDB.\nFür: reale Kristallstrukturen, Protein-Liganden-Komplexe.",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "max_results": {
+            "default": 5,
+            "title": "Max Results",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "rcsb_pdbArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "science",
+      "name": "science__chembl_search",
+      "bare_name": "chembl_search",
+      "description": "Moleküle, Targets und Bioaktivität in ChEMBL (search_type: compound|target|activity).\nFür: Wirkstoffe, Inhibitoren, Drug-Discovery, klinische Phasen.",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "search_type": {
+            "default": "compound",
+            "title": "Search Type",
+            "type": "string"
+          },
+          "max_results": {
+            "default": 5,
+            "title": "Max Results",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "chembl_searchArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "science",
+      "name": "science__string_db",
+      "bare_name": "string_db",
+      "description": "Protein-Protein-Interaktionspartner eines Gens über STRING (9606=Mensch).\nFür: Signalnetzwerke, funktionale Assoziationen, Target-Kontext.",
+      "input_schema": {
+        "properties": {
+          "gene": {
+            "title": "Gene",
+            "type": "string"
+          },
+          "species": {
+            "default": 9606,
+            "title": "Species",
+            "type": "integer"
+          },
+          "max_partners": {
+            "default": 10,
+            "title": "Max Partners",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "gene"
+        ],
+        "title": "string_dbArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "science",
+      "name": "science__ensembl_lookup",
+      "bare_name": "ensembl_lookup",
+      "description": "Gen-Annotation per Symbol ODER Varianten-Bedeutung per rsID (z.B. 'rs699') über Ensembl.\nFür: Genom-Koordinaten, Biotyp, SNP/Varianten-Konsequenzen (dbSNP/ClinVar).",
+      "input_schema": {
+        "properties": {
+          "symbol": {
+            "title": "Symbol",
+            "type": "string"
+          },
+          "species": {
+            "default": "homo_sapiens",
+            "title": "Species",
+            "type": "string"
+          }
+        },
+        "required": [
+          "symbol"
+        ],
+        "title": "ensembl_lookupArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "science",
+      "name": "science__reactome_search",
+      "bare_name": "reactome_search",
+      "description": "Biologische Signal-/Stoffwechselwege (Pathways) in Reactome suchen.\nFür: Mechanismen, Signalkaskaden, Krankheitswege, Systembiologie.",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "species": {
+            "default": "Homo sapiens",
+            "title": "Species",
+            "type": "string"
+          },
+          "max_results": {
+            "default": 5,
+            "title": "Max Results",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "reactome_searchArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "science",
+      "name": "science__openfda_search",
+      "bare_name": "openfda_search",
+      "description": "Offizielle FDA-Arzneimitteldaten: data_type 'label' (Indikation/Warnungen) oder\n'event' (gemeldete Nebenwirkungen). Für: Medikamenten-Sicherheit, Pharmakovigilanz.",
+      "input_schema": {
+        "properties": {
+          "drug": {
+            "title": "Drug",
+            "type": "string"
+          },
+          "data_type": {
+            "default": "label",
+            "title": "Data Type",
+            "type": "string"
+          },
+          "max_results": {
+            "default": 3,
+            "title": "Max Results",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "drug"
+        ],
+        "title": "openfda_searchArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "factory",
+      "name": "factory__list_capabilities",
+      "bare_name": "list_capabilities",
+      "description": "Listet alle geprüften Tool-Capabilities, die ein generierter Bot erhalten kann\n(read_file, write_file, web_fetch, arxiv_search, chembl_search, generate_image, ...).\nFür: vorab sehen, welche Bausteine die Fabrik kennt.",
+      "input_schema": {
+        "properties": {},
+        "title": "list_capabilitiesArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "factory",
+      "name": "factory__build_bot",
+      "bare_name": "build_bot",
+      "description": "Generiert UND verifiziert einen vollständigen Bot aus einer Spezifikation.\nDurchläuft Architect -> Coder -> Sandbox-Gates -> Fixer und schreibt ein\nlauffähiges Paket + BUILD_REPORT.md. Benötigt laufendes Ollama.\ndocker_sandbox=True (Standard): abschließende Verifikation in python:3.12-slim\nohne Netzwerk (G2). Falls Docker nicht verfügbar, wird der Schritt übersprungen.\nFür: einen neuen Bot/Agenten bauen lassen (mit echter Verifikation).",
+      "input_schema": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "system_prompt": {
+            "default": "",
+            "title": "System Prompt",
+            "type": "string"
+          },
+          "first_message": {
+            "default": "Hallo!",
+            "title": "First Message",
+            "type": "string"
+          },
+          "model": {
+            "default": "llama3.1:8b",
+            "title": "Model",
+            "type": "string"
+          },
+          "docker_sandbox": {
+            "default": true,
+            "title": "Docker Sandbox",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "build_botArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "factory",
+      "name": "factory__verify_package",
+      "bare_name": "verify_package",
+      "description": "Verifiziert ein generiertes Bot-Paket: prüft die Struktur und versucht,\nbot.runner zu importieren. Primär in Docker (python:3.12-slim, --network none);\nFallback auf lokalen Subprozess wenn Docker nicht verfügbar.\nFür: bestätigen, dass ein gebautes Paket wirklich lauffähig ist.",
+      "input_schema": {
+        "properties": {
+          "path": {
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "title": "verify_packageArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "factory",
+      "name": "factory__start_webapp",
+      "bare_name": "start_webapp",
+      "description": "I2 Fabrik mit Augen: startet eine gebaute Web-App auf einem lokalen Port.\n\nSucht im Bot-Verzeichnis nach app.py / main.py / bot/runner.py und startet\nsie als Hintergrundprozess. Wartet bis der Port antwortet (max. wait_seconds).\n\npath:         Pfad zum Build-Verzeichnis (aus build_bot)\nport:         Port für die App (Standard 8765; 0 = automatisch frei wählen)\nwait_seconds: Sekunden warten bis die App bereit ist (Standard 8)\n\nGibt die URL zurück oder eine Fehlermeldung.",
+      "input_schema": {
+        "properties": {
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "port": {
+            "default": 8765,
+            "title": "Port",
+            "type": "integer"
+          },
+          "wait_seconds": {
+            "default": 8,
+            "title": "Wait Seconds",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "title": "start_webappArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "factory",
+      "name": "factory__screenshot_webapp",
+      "bare_name": "screenshot_webapp",
+      "description": "I2 Fabrik mit Augen: Screenshot einer laufenden Web-App (headless Chromium).\n\nBenötigt playwright: `pip install playwright && playwright install chromium`\nFalls playwright fehlt, wird eine klare Installationsanleitung zurückgegeben.\n\nurl:         URL der App (z.B. http://localhost:8765)\noutput_path: Pfad für den Screenshot (leer = auto in bot1/output/screenshots/)\n\nGibt den Pfad zum gespeicherten PNG zurück oder eine Fehlermeldung.",
+      "input_schema": {
+        "properties": {
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "output_path": {
+            "default": "",
+            "title": "Output Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "screenshot_webappArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "review",
+      "name": "review__review_code",
+      "bare_name": "review_code",
+      "description": "Reviewt einen Python-Quelltext (String): Syntax, Sicherheit (eval/exec/os.system),\nveränderbare Defaults, nackte excepts, Komplexität, fehlende Docstrings, TODO-Marker.\nFür: schnelle Qualitätsprüfung von generiertem oder geschriebenem Code.",
+      "input_schema": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "filename": {
+            "default": "snippet.py",
+            "title": "Filename",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "review_codeArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "review",
+      "name": "review__review_file",
+      "bare_name": "review_file",
+      "description": "Reviewt eine Python-Datei auf der Platte (siehe review_code).\nFür: Prüfung einer konkreten Quelldatei.",
+      "input_schema": {
+        "properties": {
+          "path": {
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "title": "review_fileArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "review",
+      "name": "review__scan_repo",
+      "bare_name": "scan_repo",
+      "description": "Scannt alle .py-Dateien eines Verzeichnisses und aggregiert die Findings\n(kritische zuerst). Für: Gesamt-Review eines generierten Projekts/Repos.",
+      "input_schema": {
+        "properties": {
+          "repo_path": {
+            "title": "Repo Path",
+            "type": "string"
+          },
+          "max_files": {
+            "default": 50,
+            "title": "Max Files",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "repo_path"
+        ],
+        "title": "scan_repoArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "review",
+      "name": "review__visual_review",
+      "bare_name": "visual_review",
+      "description": "I2 Fabrik mit Augen: prüft einen Screenshot einer Web-App gegen eine Spezifikation.\n\nNutzt das multimodale Ollama-Modell (qwen3-vl) um den Screenshot zu analysieren\nund konkrete visuelle Findings (fehlende Elemente, Layout-Brüche, Spec-Verstösse)\nzurückzugeben.\n\nVRAM-Hinweis: qwen3-vl:32b braucht ~20 GB VRAM. Bei 16 GB VRAM zuerst\ngpt-oss-32k in Ollama entladen (`ollama stop gpt-oss-32k`) oder\nplanner.can_load vorab prüfen.\n\nscreenshot_path: absoluter Pfad zu PNG/JPG\nspec:            Spezifikation als Text (was soll sichtbar/korrekt sein?)\nmodel:           Ollama-Modell (Standard: qwen3-vl:32b)",
+      "input_schema": {
+        "properties": {
+          "screenshot_path": {
+            "title": "Screenshot Path",
+            "type": "string"
+          },
+          "spec": {
+            "title": "Spec",
+            "type": "string"
+          },
+          "model": {
+            "default": "qwen3-vl:32b",
+            "title": "Model",
+            "type": "string"
+          }
+        },
+        "required": [
+          "screenshot_path",
+          "spec"
+        ],
+        "title": "visual_reviewArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "planner",
+      "name": "planner__get_resources",
+      "bare_name": "get_resources",
+      "description": "Aktueller Hardware-Zustand: RAM, VRAM, GPU-Auslastung, CPU.\nFür: Entscheidung, ob ein Modell/Dienst lokal geladen werden kann.",
+      "input_schema": {
+        "properties": {},
+        "title": "get_resourcesArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "planner",
+      "name": "planner__can_load",
+      "bare_name": "can_load",
+      "description": "Prüft, ob 'required_gb' GB im Ziel-Speicher frei sind (target: 'vram' oder 'ram').\nFür: vorab klären, ob ein Modell/Dienst gestartet werden kann.",
+      "input_schema": {
+        "properties": {
+          "required_gb": {
+            "title": "Required Gb",
+            "type": "number"
+          },
+          "target": {
+            "default": "vram",
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "required_gb"
+        ],
+        "title": "can_loadArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "planner",
+      "name": "planner__recommend",
+      "bare_name": "recommend",
+      "description": "Empfiehlt eine Modellgröße für die aktuelle Hardware und einen Task-Typ\n(coding|reasoning|routing|vision). Für: passende lokale Modellwahl.",
+      "input_schema": {
+        "properties": {
+          "task": {
+            "default": "coding",
+            "title": "Task",
+            "type": "string"
+          }
+        },
+        "title": "recommendArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "knowledge",
+      "name": "knowledge__knowledge_search",
+      "bare_name": "knowledge_search",
+      "description": "Durchsucht den lokalen Lern-Korpus (system-design-primer, roadmaps,\npublic-apis, build-your-own-x, ...) und liefert die relevantesten Dokumente\nmit Auszug und Quelle. Optional auf ein Thema einschränken\n(tag: architektur|roadmap|apis|implementierung|coding|...).\nFür: Architektur-, API-, Lern- und Implementierungswissen.",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "max_results": {
+            "default": 5,
+            "title": "Max Results",
+            "type": "integer"
+          },
+          "tag": {
+            "default": "",
+            "title": "Tag",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "knowledge_searchArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "knowledge",
+      "name": "knowledge__knowledge_stats",
+      "bare_name": "knowledge_stats",
+      "description": "Zeigt den Zustand des Wissens-Index (Anzahl Dokumente, Themen).\nFür: prüfen, ob der Korpus indexiert ist.",
+      "input_schema": {
+        "properties": {},
+        "title": "knowledge_statsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "llm",
+      "name": "llm__code_generate",
+      "bare_name": "code_generate",
+      "description": "Generiert Quellcode mit dem spezialisierten Code-Modell (codestral).\nFür: Funktionen/Skripte/Klassen schreiben, Code erklären/refactoren.\n`task` = präzise Aufgabe, `language` = Programmiersprache (default python).",
+      "input_schema": {
+        "properties": {
+          "task": {
+            "title": "Task",
+            "type": "string"
+          },
+          "language": {
+            "default": "python",
+            "title": "Language",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task"
+        ],
+        "title": "code_generateArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "llm",
+      "name": "llm__vision_describe",
+      "bare_name": "vision_describe",
+      "description": "Analysiert ein lokales Bild mit dem multimodalen Modell (qwen3-vl).\nFür: Screenshots/Diagramme/Fotos verstehen, Text aus Bildern lesen.\n`image_path` = Pfad zu einer Bilddatei (png/jpg), `question` = was du wissen willst.",
+      "input_schema": {
+        "properties": {
+          "image_path": {
+            "title": "Image Path",
+            "type": "string"
+          },
+          "question": {
+            "default": "Beschreibe dieses Bild genau.",
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "image_path"
+        ],
+        "title": "vision_describeArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "llm",
+      "name": "llm__reason_deep",
+      "bare_name": "reason_deep",
+      "description": "Tiefes Reasoning/Analyse mit dem starken Modell (gpt-oss:20b).\nFür: schwierige Schlussfolgerungen, Planung, Abwägungen, Synthese.\n`prompt` = die zu durchdenkende Frage/Aufgabe.\nR1-Fallback-Leiter: gpt-oss lokal -> cloud_cheap (DeepSeek) -> qwen2.5:7b.\nFällt eine Stufe aus (OOM/Timeout/Verweigerung), übernimmt die nächste —\ndie Antwort vermerkt dann den Abstieg.",
+      "input_schema": {
+        "properties": {
+          "prompt": {
+            "title": "Prompt",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "title": "reason_deepArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "llm",
+      "name": "llm__quick_answer",
+      "bare_name": "quick_answer",
+      "description": "Schnelle Antwort/Klassifikation mit kleinem, flottem Modell (qwen2.5:7b).\nFür: kurze Fragen, Routing-Entscheidungen, Zusammenfassen, Klassifizieren.\n`prompt` = die kurze Aufgabe.",
+      "input_schema": {
+        "properties": {
+          "prompt": {
+            "title": "Prompt",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "title": "quick_answerArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "llm",
+      "name": "llm__cloud_reason",
+      "bare_name": "cloud_reason",
+      "description": "STÄRKSTES Reasoning (Claude Opus über OpenRouter) — TEUERSTE Stufe, LETZTER Ausweg.\nNUR aufrufen, wenn die Aufgabe WIRKLICH SCHWER ist (mehrstufige Logik, knifflige\nTrade-offs, tiefe Analyse über viel Kontext) UND die lokalen Modelle (reason_deep)\nbzw. cloud_cheap (DeepSeek) nicht ausreichen. NIEMALS für einfache/mittlere Fragen —\ndafür lokal antworten. Jeder Aufruf kostet spürbar Geld und sendet Text in die Cloud.\n`prompt` = die wirklich anspruchsvolle Frage/Aufgabe.",
+      "input_schema": {
+        "properties": {
+          "prompt": {
+            "title": "Prompt",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "title": "cloud_reasonArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "llm",
+      "name": "llm__cloud_cheap",
+      "bare_name": "cloud_cheap",
+      "description": "GÜNSTIGES Cloud-Modell (DeepSeek über OpenRouter) — ~10-15x billiger als Claude.\nFür: Cloud-Qualität bei begrenztem Budget, Routine-Reasoning, Zusammenfassen,\nlängere Texte. Stärker als die lokalen Modelle, aber sehr günstig. Wenn es um\nmaximale Qualität geht, stattdessen cloud_reason (Claude) nehmen.\n`prompt` = die Aufgabe/Frage.",
+      "input_schema": {
+        "properties": {
+          "prompt": {
+            "title": "Prompt",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "title": "cloud_cheapArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "llm",
+      "name": "llm__cloud_code",
+      "bare_name": "cloud_code",
+      "description": "STARKE Cloud-Codegenerierung (Claude über OpenRouter). KOSTET Geld + Cloud.\nNUR aufrufen, wenn der Nutzer ausdrücklich starken/Cloud-Code wünscht ODER die\nAufgabe wirklich komplex ist (Architektur, mehrteilige Module, kniffliges Refactoring).\nStandard für Code ist LOKAL (code_generate/codestral) — nicht für triviale Snippets\noder normale Funktionen die Cloud nehmen. `task` = Aufgabe, `language` = Sprache.",
+      "input_schema": {
+        "properties": {
+          "task": {
+            "title": "Task",
+            "type": "string"
+          },
+          "language": {
+            "default": "python",
+            "title": "Language",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task"
+        ],
+        "title": "cloud_codeArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "llm",
+      "name": "llm__council",
+      "bare_name": "council",
+      "description": "Rat der Modelle: lokal (gpt-oss:20b) + cloud_cheap (DeepSeek) antworten UNABHAENGIG;\nein Richter fasst zusammen und markiert Widersprueche EXPLIZIT als Liste.\nKillt Single-Model-Blindspots bei wichtigen Entscheidungen.\nKosten: 1 DeepSeek-Call (Centbereich) + optionaler Richter-Cloud-Call.\n`prompt` = die Frage/Aufgabe.\n`judge`  = 'local' (gpt-oss, Default) | 'cloud' (Claude Opus, teurer, fuer kritische Entscheidungen).\nTrigger: 'wichtige Entscheidung', 'Zweitmeinung', 'sicher gehen', 'vergleiche Antworten'.",
+      "input_schema": {
+        "properties": {
+          "prompt": {
+            "title": "Prompt",
+            "type": "string"
+          },
+          "judge": {
+            "default": "local",
+            "title": "Judge",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "title": "councilArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "llm",
+      "name": "llm__budget_status",
+      "bare_name": "budget_status",
+      "description": "Zeigt den heutigen Cloud-API-Verbrauch und das Tageslimit.\nFür: prüfen, wie viel Cloud-Budget heute noch übrig ist, bevor man\ncloud_reason / cloud_cheap / cloud_code aufruft.",
+      "input_schema": {
+        "properties": {},
+        "title": "budget_statusArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "llm",
+      "name": "llm__ollama_loaded_models",
+      "bare_name": "ollama_loaded_models",
+      "description": "Zeigt welche Ollama-Modelle aktuell im VRAM geladen sind und wie viel sie belegen.\nFuer: pruefen ob VRAM frei ist, bevor man ComfyUI (Bild/Video) startet.",
+      "input_schema": {
+        "properties": {},
+        "title": "ollama_loaded_modelsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "llm",
+      "name": "llm__ollama_unload_all",
+      "bare_name": "ollama_unload_all",
+      "description": "Entlaedt ALLE geladenen Ollama-Modelle aus dem VRAM.\n\nPFLICHT vor Bild- und Video-Generierung via ComfyUI — das grosse LLM (gpt-oss-32k,\n~14 GB) und ComfyUI/SDXL (~6-10 GB) passen nicht gleichzeitig in 16 GB VRAM.\n\nWICHTIG fuer Sequenzen (mehrere Bilder/Videos hintereinander):\n  1. Einmal ollama_unload_all() am Anfang\n  2. ALLE ComfyUI-Jobs hintereinander (kein zwischenzeitliches Reload!)\n  3. Danach ollama_reload_main() — Modell vorladen bevor LLM-Aktionen folgen\n     (z.B. senden, beschreiben, weiterrechnen)\n\nEinzeljob-Workflow:\n  1. llm.ollama_unload_all()\n  2. comfy / video-generate\n  3. llm.ollama_reload_main()  — dann weiter mit LLM-Aufgaben",
+      "input_schema": {
+        "properties": {},
+        "title": "ollama_unload_allArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "llm",
+      "name": "llm__ollama_reload_main",
+      "bare_name": "ollama_reload_main",
+      "description": "Laedt das Haupt-LLM (gpt-oss-32k) wieder in den VRAM vor.\n\nNACH dem letzten ComfyUI-Job aufrufen — BEVOR LLM-Aktionen folgen\n(Versand, Beschreibung, weitere Berechnungen). So ist das Modell\nsofort bereit und der naechste Aufruf hat keine Kaltstartverzoegerung.\n\nSequenz-Workflow:\n  ollama_unload_all()\n  → comfy/video Job 1\n  → comfy/video Job 2\n  → ...alle Jobs...\n  → ollama_reload_main()   <-- hier\n  → mail senden / telegram / weiter mit LLM",
+      "input_schema": {
+        "properties": {},
+        "title": "ollama_reload_mainArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "llm",
+      "name": "llm__route_model",
+      "bare_name": "route_model",
+      "description": "Empfiehlt, welches lokale Modell/Tool für eine Aufgabe am besten passt.\nFür: das Hirn entscheidet vorab, welches Spezial-Tool es aufrufen soll.\nF2 (V3): sobald genug Trace-Daten vorliegen (>=20 Läufe je Aufgabentyp+Modell),\nwählt das BELEGT beste Modell statt der Handregel; die Handregel bleibt\nKaltstart-Prior. 10% Exploration, damit Alternativen Daten sammeln.\nGibt Aufgabentyp, Modell, passendes llm-Tool und Begründung zurück.",
+      "input_schema": {
+        "properties": {
+          "task_description": {
+            "title": "Task Description",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_description"
+        ],
+        "title": "route_modelArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "llm",
+      "name": "llm__routing_stats",
+      "bare_name": "routing_stats",
+      "description": "F2: zeigt die empirischen Routing-Daten je (Aufgabentyp, Modell):\nAnzahl Läufe, Erfolgsquote, Ø-Latenz, Ø-Kosten. Ab >=20 Läufen (D18)\nüberschreibt die Empirie die Handregel in route_model.",
+      "input_schema": {
+        "properties": {},
+        "title": "routing_statsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "research",
+      "name": "research__deep_research",
+      "bare_name": "deep_research",
+      "description": "Führt eine mehrstufige Web-Recherche zu einem Thema durch und liefert einen\nstrukturierten Bericht MIT Quellen. Für: tiefe Fragen, die mehrere Quellen\nbrauchen (Stand der Technik, Vergleiche, Hintergründe). Lokal, ohne Cloud-Key.\n`topic` = Thema/Frage, `num_subqueries` = Anzahl Teilrecherchen (1-5),\n`sources_per_query` = Treffer je Teilrecherche.",
+      "input_schema": {
+        "properties": {
+          "topic": {
+            "title": "Topic",
+            "type": "string"
+          },
+          "num_subqueries": {
+            "default": 3,
+            "title": "Num Subqueries",
+            "type": "integer"
+          },
+          "sources_per_query": {
+            "default": 4,
+            "title": "Sources Per Query",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "title": "deep_researchArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "research",
+      "name": "research__web_lookup",
+      "bare_name": "web_lookup",
+      "description": "Schnelle einzelne Web-Suche (DuckDuckGo) inkl. Text der Top-Seite.\nFür: eine konkrete Faktenfrage, aktuelle Infos. Leichter als deep_research.",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "max_results": {
+            "default": 5,
+            "title": "Max Results",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "web_lookupArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "pdf",
+      "name": "pdf__pdf_create",
+      "bare_name": "pdf_create",
+      "description": "Erzeugt EINE NEUE PDF aus Titel + Text/Markdown und speichert sie als Datei.\nFür: Recherche-Ergebnisse, Berichte oder Zusammenfassungen als PDF ausgeben\n(z.B. um sie dann zu verschicken). `title` = Überschrift, `content` = der Text\n(einfaches Markdown: '# Überschrift', '## ', '- Aufzählung', **fett** werden\nformatiert), `filename` = optionaler Dateiname (sonst aus dem Titel abgeleitet).\nGibt den ABSOLUTEN PFAD der erzeugten PDF zurück (für mail email_send o.ä.).",
+      "input_schema": {
+        "properties": {
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "filename": {
+            "default": "",
+            "title": "Filename",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "content"
+        ],
+        "title": "pdf_createArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "pdf",
+      "name": "pdf__pdf_extract",
+      "bare_name": "pdf_extract",
+      "description": "Extrahiert den Text aus einer PDF-Datei (bis max_pages Seiten).\nFür: Inhalt einer PDF lesbar machen, bevor man sie weiterverarbeitet.\n`pdf_path` = Pfad zur PDF, `max_pages` = max. Seitenzahl.",
+      "input_schema": {
+        "properties": {
+          "pdf_path": {
+            "title": "Pdf Path",
+            "type": "string"
+          },
+          "max_pages": {
+            "default": 30,
+            "title": "Max Pages",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "pdf_path"
+        ],
+        "title": "pdf_extractArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "pdf",
+      "name": "pdf__pdf_summarize",
+      "bare_name": "pdf_summarize",
+      "description": "Fasst eine PDF auf Deutsch zusammen (lokales Modell, ohne Cloud).\nFür: schnell verstehen, worum es in einem Dokument/Paper geht.\n`pdf_path` = Pfad zur PDF, `max_pages` = wie viele Seiten einbeziehen,\n`focus` = optionaler Schwerpunkt (z.B. 'Methodik', 'Ergebnisse').",
+      "input_schema": {
+        "properties": {
+          "pdf_path": {
+            "title": "Pdf Path",
+            "type": "string"
+          },
+          "max_pages": {
+            "default": 30,
+            "title": "Max Pages",
+            "type": "integer"
+          },
+          "focus": {
+            "default": "",
+            "title": "Focus",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pdf_path"
+        ],
+        "title": "pdf_summarizeArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "pdf",
+      "name": "pdf__pdf_translate",
+      "bare_name": "pdf_translate",
+      "description": "Übersetzt den Text einer PDF in eine Zielsprache (lokales Modell, ohne Cloud).\nFür: fremdsprachige Dokumente/Paper lesbar machen.\n`pdf_path` = Pfad zur PDF, `target_lang` = Zielsprache (default Deutsch),\n`max_pages` = wie viele Seiten (Übersetzung ist token-intensiv, klein halten).",
+      "input_schema": {
+        "properties": {
+          "pdf_path": {
+            "title": "Pdf Path",
+            "type": "string"
+          },
+          "target_lang": {
+            "default": "Deutsch",
+            "title": "Target Lang",
+            "type": "string"
+          },
+          "max_pages": {
+            "default": 10,
+            "title": "Max Pages",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "pdf_path"
+        ],
+        "title": "pdf_translateArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wiki",
+      "name": "wiki__repo_tree",
+      "bare_name": "repo_tree",
+      "description": "Schneller Struktur-/Sprachen-Überblick eines Repos (ohne Modell).\nFür: erstmal sehen, woraus ein Repo besteht. `repo_path` = Pfad zum Repo.",
+      "input_schema": {
+        "properties": {
+          "repo_path": {
+            "title": "Repo Path",
+            "type": "string"
+          },
+          "max_files": {
+            "default": 400,
+            "title": "Max Files",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "repo_path"
+        ],
+        "title": "repo_treeArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wiki",
+      "name": "wiki__document_repo",
+      "bare_name": "document_repo",
+      "description": "Erzeugt eine Architektur-Doku (Markdown) für ein Repo: Zweck, Hauptkomponenten,\nDatenfluss, wichtige Module, Einstiegspunkte. Für: ein fremdes/eigenes Repo schnell\nverstehen oder dokumentieren. `repo_path` = Pfad, `focus` = optionaler Schwerpunkt.",
+      "input_schema": {
+        "properties": {
+          "repo_path": {
+            "title": "Repo Path",
+            "type": "string"
+          },
+          "focus": {
+            "default": "",
+            "title": "Focus",
+            "type": "string"
+          }
+        },
+        "required": [
+          "repo_path"
+        ],
+        "title": "document_repoArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wiki",
+      "name": "wiki__list_article_topics",
+      "bare_name": "list_article_topics",
+      "description": "Listet die vorgefertigten Artikel-Themen für 'build_in_public'.\nFür: sehen, über welche Aspekte der Matrix ein Artikel geschrieben werden kann.",
+      "input_schema": {
+        "properties": {},
+        "title": "list_article_topicsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wiki",
+      "name": "wiki__build_in_public",
+      "bare_name": "build_in_public",
+      "description": "Schreibt einen Blog-Artikel über die Schöpfer-Matrix — 'Build in public'.\nStützt sich auf den tatsächlichen Code (wiki.repo_tree + AST-Scan), kein Raten.\ntopic: Schlüssel aus list_article_topics() ODER freier Themensatz.\nsave=True: Artikel als Markdown in n:/allinall/articles/ speichern.\nFür: Trigger 'schreib einen Artikel', 'build in public', 'dokumentiere dich selbst'.",
+      "input_schema": {
+        "properties": {
+          "topic": {
+            "default": "überblick",
+            "title": "Topic",
+            "type": "string"
+          },
+          "save": {
+            "default": true,
+            "title": "Save",
+            "type": "boolean"
+          }
+        },
+        "title": "build_in_publicArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "molviz",
+      "name": "molviz__protein_3d",
+      "bare_name": "protein_3d",
+      "description": "Erzeugt eine interaktive 3D-Ansicht einer Proteinstruktur als HTML-Datei.\n`identifier` = PDB-ID (4 Zeichen, z.B. '1TUP') ODER UniProt-ID (AlphaFold,\nz.B. 'P04637'). `style` = 'cartoon' (Standard) oder 'surface'. Gibt den Pfad\nzur HTML-Datei zurück — im Browser öffnen zum Drehen/Zoomen.",
+      "input_schema": {
+        "properties": {
+          "identifier": {
+            "title": "Identifier",
+            "type": "string"
+          },
+          "style": {
+            "default": "cartoon",
+            "title": "Style",
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier"
+        ],
+        "title": "protein_3dArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "molviz",
+      "name": "molviz__molecule_3d",
+      "bare_name": "molecule_3d",
+      "description": "Erzeugt eine interaktive 3D-Ansicht eines kleinen Moleküls aus seinem SMILES.\n`smiles` = SMILES-String (z.B. 'CC(=O)Oc1ccccc1C(=O)O' für Aspirin),\n`name` = Dateiname-Basis. 3D-Koordinaten kommen von NCI CACTUS. Gibt den Pfad\nzur HTML-Datei zurück — im Browser öffnen (Sticks-Darstellung, drehbar).",
+      "input_schema": {
+        "properties": {
+          "smiles": {
+            "title": "Smiles",
+            "type": "string"
+          },
+          "name": {
+            "default": "molekuel",
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "smiles"
+        ],
+        "title": "molecule_3dArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "kb",
+      "name": "kb__kb_search",
+      "bare_name": "kb_search",
+      "description": "Durchsucht die Wissensbasis (Korpus der Schöpfer-Matrix) per HYBRID SEARCH\n(semantische Vektor-Suche + Keyword/BM25, multilingual). Für: fundierte Fakten\naus dem Lern-Korpus holen, bevor man antwortet. `query` = Frage/Stichworte,\n`top_k` = Anzahl Treffer. Gibt die relevantesten Textstellen mit Quelle zurück.",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "top_k": {
+            "default": 5,
+            "title": "Top K",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "kb_searchArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "kb",
+      "name": "kb__kb_ingest",
+      "bare_name": "kb_ingest",
+      "description": "Fügt Text in die Wissensbasis ein (V12: Lern-Schleife schließen).\nVerwende nach jedem research-/deep-research-/pdf_extract-Ergebnis, damit\ndas System seine eigenen Berichte später abrufen kann.\n\ntext      = Inhalt (Markdown/Klartext, max ~200 KB empfohlen)\ntitle     = Dokumenttitel (leer = Zeitstempel)\nmeta_json = optionale Metadaten als JSON-Dict z.B. '{\"quelle\":\"arXiv\",\"thema\":\"EGFR\"}'\n\nGibt die WeKnora-Knowledge-ID zurück oder eine Fehlermeldung.",
+      "input_schema": {
+        "properties": {
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "meta_json": {
+            "default": "{}",
+            "title": "Meta Json",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "kb_ingestArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "kb",
+      "name": "kb__kb_ingest_url",
+      "bare_name": "kb_ingest_url",
+      "description": "Ingestiert eine Web-URL in die Wissensbasis (WeKnora lädt + chunked).\nGut für: Paper-Abstracts, Docs-Seiten, Blog-Posts direkt per URL einlesen.\n\nurl   = vollständige HTTP(S)-URL\ntitle = optionaler Dokumenttitel (leer = URL selbst)\n\nGibt die WeKnora-Knowledge-ID zurück oder eine Fehlermeldung.",
+      "input_schema": {
+        "properties": {
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "kb_ingest_urlArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "kb",
+      "name": "kb__playbook_save",
+      "bare_name": "playbook_save",
+      "description": "Speichert ein PLAYBOOK: wie eine mehrstufige Aufgabe ERFOLGREICH gelöst wurde.\n\nNUR nach bestandenem Gate aufrufen (erfolgreiche supervisor-Läufe) — sonst\nlernt das System Murks. Gibt es zur Signatur schon ein Playbook, wird das\nalte archiviert (nie gelöscht, D19) und das neue gespeichert.\n\nsignature: Aufgaben-Signatur 'kategorie+stichwort', z.B. 'repo-review+python',\n           'recherche+biotech', 'android-app+protein'\ntitle:     Kurzbeschreibung der Aufgabe\ncontent:   Das Verfahren: Schrittfolge, genutzte Tools+Parameter,\n           Stolperstellen + wie umgangen (Markdown).",
+      "input_schema": {
+        "properties": {
+          "signature": {
+            "title": "Signature",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          }
+        },
+        "required": [
+          "signature",
+          "title",
+          "content"
+        ],
+        "title": "playbook_saveArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "kb",
+      "name": "kb__playbook_lookup",
+      "bare_name": "playbook_lookup",
+      "description": "Holt das Playbook zu einer Aufgaben-Signatur — VOR dem Planen aufrufen!\n\nMatch-Logik: exakte Signatur zuerst, sonst Teilwort-Match (beste Überdeckung).\nDas Playbook ist ein VORSCHLAG als Startplan, kein Befehl (D16) — bei\nanderer Lage davon abweichen.\n\nsignature: z.B. 'repo-review+python'. Bei Treffer: Titel + Verfahren.",
+      "input_schema": {
+        "properties": {
+          "signature": {
+            "title": "Signature",
+            "type": "string"
+          }
+        },
+        "required": [
+          "signature"
+        ],
+        "title": "playbook_lookupArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "kb",
+      "name": "kb__playbook_list",
+      "bare_name": "playbook_list",
+      "description": "Listet alle aktiven Playbooks (Signatur, Titel, Nutzungen).",
+      "input_schema": {
+        "properties": {},
+        "title": "playbook_listArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "kb",
+      "name": "kb__kb_dedup",
+      "bare_name": "kb_dedup",
+      "description": "Gedächtnis-Pflege: führt near-duplicate Playbooks zusammen (G2).\n\nGleiche Signatur ODER >85% Text-Ähnlichkeit → ältere Version wird\narchiviert (NIE gelöscht, D19), die neueste bleibt aktiv.\nWöchentlich per Cron aufrufen (neben der Retro N9).\nGibt Protokoll zurück: 'x zusammengeführt, y archiviert'.",
+      "input_schema": {
+        "properties": {},
+        "title": "kb_dedupArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "kb",
+      "name": "kb__kb_resolve_conflicts",
+      "bare_name": "kb_resolve_conflicts",
+      "description": "Gedächtnis-Pflege: löst widersprüchliche Playbooks je Signatur auf (G2).\n\nRegel: die NEUESTE Version gewinnt, ältere werden als 'veraltet' archiviert\n(nie gelöscht, D19 — Original bleibt in der DB abrufbar).\n\nsignature: nur diese Signatur prüfen (leer = alle).",
+      "input_schema": {
+        "properties": {
+          "signature": {
+            "default": "",
+            "title": "Signature",
+            "type": "string"
+          }
+        },
+        "title": "kb_resolve_conflictsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "kb",
+      "name": "kb__kb_stats",
+      "bare_name": "kb_stats",
+      "description": "Status/Größe der Wissensbasis (Anzahl Dokumente, Chunks, Verarbeitung).\nFür: prüfen, ob/was in der Wissensbasis indexiert ist.",
+      "input_schema": {
+        "properties": {},
+        "title": "kb_statsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "mail",
+      "name": "mail__email_send",
+      "bare_name": "email_send",
+      "description": "Stellt eine E-Mail in die APPROVAL-WARTESCHLANGE.\nGibt PENDING <id> zurück — der Nutzer muss 'GO <id>' bestätigen, erst dann wird\ngesendet. `to` = Empfänger (PFLICHT), `subject` = Betreff, `body` = Text,\n`attachment_path` = ABSOLUTER Pfad der Datei (z.B. erzeugtes PDF).\nKEIN Standard-Empfänger — fehlt 'to', beim Nutzer nachfragen.",
+      "input_schema": {
+        "properties": {
+          "to": {
+            "title": "To",
+            "type": "string"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          },
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "attachment_path": {
+            "default": "",
+            "title": "Attachment Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "to",
+          "subject",
+          "body"
+        ],
+        "title": "email_sendArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "mail",
+      "name": "mail__telegram_send",
+      "bare_name": "telegram_send",
+      "description": "Schickt eine DATEI (z.B. PDF) via Telegram — gated für Fremd-Chats.\nAn den eigenen (Standard-)Chat wird direkt gesendet.\nAn fremde chat_id → PENDING <id>, Nutzer muss 'GO <id>' bestätigen.\n`file_path` = ABSOLUTER Pfad, `caption` = Begleittext, `chat_id` = Ziel (leer = Standard).",
+      "input_schema": {
+        "properties": {
+          "file_path": {
+            "title": "File Path",
+            "type": "string"
+          },
+          "caption": {
+            "default": "",
+            "title": "Caption",
+            "type": "string"
+          },
+          "chat_id": {
+            "default": "",
+            "title": "Chat Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file_path"
+        ],
+        "title": "telegram_sendArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "mail",
+      "name": "mail__telegram_send_voice",
+      "bare_name": "telegram_send_voice",
+      "description": "Schickt eine Audiodatei als Telegram-SPRACHNACHRICHT (sendVoice, kein Gate für eigenen Chat).\nWAV-Dateien werden automatisch nach OGG/Opus konvertiert (benötigt ffmpeg).\nFür: Podcast-Ergebnis, TTS-Antwort, Audio-Bericht. Eigener Standard-Chat: sofort.\n`file_path` = ABSOLUTER Pfad zur WAV/OGG-Datei.",
+      "input_schema": {
+        "properties": {
+          "file_path": {
+            "title": "File Path",
+            "type": "string"
+          },
+          "caption": {
+            "default": "",
+            "title": "Caption",
+            "type": "string"
+          },
+          "chat_id": {
+            "default": "",
+            "title": "Chat Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file_path"
+        ],
+        "title": "telegram_send_voiceArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "mail",
+      "name": "mail__confirm_action",
+      "bare_name": "confirm_action",
+      "description": "Führt eine PENDING-Aktion aus (nachdem der Nutzer 'GO <id>' geschickt hat).\n`id` = die 6-stellige Ticket-ID aus dem PENDING-Ergebnis von email_send/telegram_send.\nGibt Erfolg oder Fehlermeldung zurück.",
+      "input_schema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "confirm_actionArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "mail",
+      "name": "mail__list_pending",
+      "bare_name": "list_pending",
+      "description": "Zeigt alle offenen PENDING-Aktionen (Email/Telegram, noch nicht bestätigt/abgelaufen).\nFür: dem Nutzer zeigen, was noch auf Bestätigung wartet.",
+      "input_schema": {
+        "properties": {},
+        "title": "list_pendingArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "mail",
+      "name": "mail__cancel_action",
+      "bare_name": "cancel_action",
+      "description": "Bricht eine PENDING-Aktion ab.\n`id` = die 6-stellige Ticket-ID. Gibt Bestätigung zurück.",
+      "input_schema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "cancel_actionArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "mail",
+      "name": "mail__delivery_status",
+      "bare_name": "delivery_status",
+      "description": "Zeigt, welche Zustellwege eingerichtet sind (ohne Passwörter zu verraten).\nFür: prüfen, ob email_send / telegram_send funktionieren werden.",
+      "input_schema": {
+        "properties": {},
+        "title": "delivery_statusArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "assistant",
+      "name": "assistant__research_pdf_send",
+      "bare_name": "research_pdf_send",
+      "description": "RECHERCHIEREN -> PDF -> ZUSTELLEN in EINEM Schritt (genau für Anfragen wie\n'suche Infos über X, fasse als PDF zusammen und schick es mir [per Mail an ...]').\nMacht die ganze Kette intern (kein Kontext-Ueberlauf). `topic` = Thema/Frage,\n`email_to` = Ziel-E-Mail (leer = per Telegram schicken), `title` = optionaler\nPDF-Titel. Liefert eine kurze Statuszeile (Pfad + wohin zugestellt).",
+      "input_schema": {
+        "properties": {
+          "topic": {
+            "title": "Topic",
+            "type": "string"
+          },
+          "email_to": {
+            "default": "",
+            "title": "Email To",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "title": "research_pdf_sendArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "assistant",
+      "name": "assistant__download_file",
+      "bare_name": "download_file",
+      "description": "Lädt eine Datei (ISO, ZIP, PDF, Bild, …) von einer URL herunter und speichert\nsie im angegebenen Verzeichnis. `url` = Download-URL, `dest_dir` = Zielordner\n(wird erstellt falls nötig), `filename` = optionaler Dateiname (sonst aus URL).\nGibt Pfad und Größe zurück oder Fehlermeldung.",
+      "input_schema": {
+        "properties": {
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "dest_dir": {
+            "title": "Dest Dir",
+            "type": "string"
+          },
+          "filename": {
+            "default": "",
+            "title": "Filename",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "dest_dir"
+        ],
+        "title": "download_fileArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "assistant",
+      "name": "assistant__run_command",
+      "bare_name": "run_command",
+      "description": "Führt einen Shell-Befehl (PowerShell/CMD) lokal aus und gibt stdout+stderr\nzurück (max 8000 Zeichen). `command` = der Befehl, `workdir` = optionales\nArbeitsverzeichnis. Timeout: 120s. VORSICHT: Nur für sichere Befehle nutzen.",
+      "input_schema": {
+        "properties": {
+          "command": {
+            "title": "Command",
+            "type": "string"
+          },
+          "workdir": {
+            "default": "",
+            "title": "Workdir",
+            "type": "string"
+          }
+        },
+        "required": [
+          "command"
+        ],
+        "title": "run_commandArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "assistant",
+      "name": "assistant__backup_now",
+      "bare_name": "backup_now",
+      "description": "Startet SOFORT ein komplettes Schöpfer-Matrix-Backup (state, mcp-servers,\nSkripte, WeKnora-Docker-Volumes) nach I:\\backup\\matrix. Dauert 1-2 Minuten.\nTrigger: \"mach ein Backup\", \"/backup\", \"sichere alles\", \"Backup jetzt\".\nGibt Erfolg/Fehler + Backup-Pfad zurück.",
+      "input_schema": {
+        "properties": {},
+        "title": "backup_nowArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "trace",
+      "name": "trace__log_turn",
+      "bare_name": "log_turn",
+      "description": "Protokolliert einen Agent-Turn in der Trace-Datenbank.\nAufruf AM ENDE jeder Hauptinteraktion (Frage beantwortet, Aufgabe erledigt, Fehler).\nchannel   = Herkunfts-Kanal (telegram/cli/discord/…)\nmodel     = genutztes Modell (z.B. gpt-oss-32k, claude-sonnet-4.6)\ntools     = kommagetrennte Liste der aufgerufenen Tool-Namen (leer = keine)\nsummary   = 1-2-Satz-Zusammenfassung was passiert ist\nstatus    = ok | error | partial\ntokens_in/out = Tokens (0 wenn unbekannt)\ncost_usd  = Kosten in USD (0.0 wenn lokal/gratis)",
+      "input_schema": {
+        "properties": {
+          "channel": {
+            "default": "unknown",
+            "title": "Channel",
+            "type": "string"
+          },
+          "model": {
+            "default": "gpt-oss-32k",
+            "title": "Model",
+            "type": "string"
+          },
+          "tools": {
+            "default": "",
+            "title": "Tools",
+            "type": "string"
+          },
+          "summary": {
+            "default": "",
+            "title": "Summary",
+            "type": "string"
+          },
+          "status": {
+            "default": "ok",
+            "title": "Status",
+            "type": "string"
+          },
+          "tokens_in": {
+            "default": 0,
+            "title": "Tokens In",
+            "type": "integer"
+          },
+          "tokens_out": {
+            "default": 0,
+            "title": "Tokens Out",
+            "type": "integer"
+          },
+          "cost_usd": {
+            "default": 0.0,
+            "title": "Cost Usd",
+            "type": "number"
+          }
+        },
+        "title": "log_turnArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "trace",
+      "name": "trace__view_trace",
+      "bare_name": "view_trace",
+      "description": "Zeigt die letzten N Agent-Turns (Standard: 20) als kompakte Tabelle.\nFür: Überblick was der Agent zuletzt gemacht hat, Fehler-Diagnose.",
+      "input_schema": {
+        "properties": {
+          "n": {
+            "default": 20,
+            "title": "N",
+            "type": "integer"
+          }
+        },
+        "title": "view_traceArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "trace",
+      "name": "trace__log_step",
+      "bare_name": "log_step",
+      "description": "Protokolliert EINEN Pipeline-Schritt mit Latenz/Kosten (V14, Engpass-Analyse).\nAufruf nach jeder messbaren Stufe eines Turns, damit man sieht WO die Zeit hingeht.\nstep       = Stufenname, z.B. 'routing' | 'retrieval' | 'reranker' | 'llm_local' |\n             'llm_cloud' | 'subagent_merge' | 'web_fetch' | 'tool:<name>'\nlatency_ms = Dauer dieses Schritts in Millisekunden\nturn_id    = optional zugehöriger Turn (aus log_turn), 0 = unzugeordnet\ncost_usd   = Kosten dieses Schritts (0 wenn lokal/gratis)\ntokens     = verarbeitete Tokens (optional)\nstatus     = ok | error | slow\ndetail     = kurze Notiz (z.B. Modellname, Trefferzahl)",
+      "input_schema": {
+        "properties": {
+          "step": {
+            "title": "Step",
+            "type": "string"
+          },
+          "latency_ms": {
+            "default": 0,
+            "title": "Latency Ms",
+            "type": "integer"
+          },
+          "turn_id": {
+            "default": 0,
+            "title": "Turn Id",
+            "type": "integer"
+          },
+          "cost_usd": {
+            "default": 0.0,
+            "title": "Cost Usd",
+            "type": "number"
+          },
+          "tokens": {
+            "default": 0,
+            "title": "Tokens",
+            "type": "integer"
+          },
+          "status": {
+            "default": "ok",
+            "title": "Status",
+            "type": "string"
+          },
+          "detail": {
+            "default": "",
+            "title": "Detail",
+            "type": "string"
+          }
+        },
+        "required": [
+          "step"
+        ],
+        "title": "log_stepArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "trace",
+      "name": "trace__step_stats",
+      "bare_name": "step_stats",
+      "description": "ENGPASS-ANALYSE (V14): aggregiert Pro-Schritt-Latenz/Kosten der letzten N Tage.\nZeigt je Stufe: Anzahl, Gesamt-/Durchschnitts-/p50-/p95-Latenz, Anteil an der\nGesamtzeit und Kosten — damit man gezielt optimiert ('90% geht in den Reranker')\nstatt zu raten. Standard: 7 Tage.",
+      "input_schema": {
+        "properties": {
+          "days": {
+            "default": 7,
+            "title": "Days",
+            "type": "integer"
+          }
+        },
+        "title": "step_statsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "trace",
+      "name": "trace__trace_stats",
+      "bare_name": "trace_stats",
+      "description": "Aggregat-Statistiken der letzten N Tage (Standard: 7).\nZeigt: Turns pro Kanal/Modell, Fehlerrate, Gesamt-Kosten, Top-Tools.",
+      "input_schema": {
+        "properties": {
+          "days": {
+            "default": 7,
+            "title": "Days",
+            "type": "integer"
+          }
+        },
+        "title": "trace_statsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "status",
+      "name": "status__system_status",
+      "bare_name": "system_status",
+      "description": "Zeigt den Systemstatus aller Matrix-Dienste (Ampel: grün/gelb/rot).\nFür: schneller Überblick ob alles läuft (Ollama, Gateway, WeKnora, Reranker,\nComfyUI), plus VRAM-Auslastung, Disk-Platz und heutiges Cloud-Budget.",
+      "input_schema": {
+        "properties": {},
+        "title": "system_statusArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "voice",
+      "name": "voice__transcribe",
+      "bare_name": "transcribe",
+      "description": "Transkribiert eine Audiodatei lokal via faster-whisper.\n\nArgs:\n    audio_file: Absoluter Pfad zur Audiodatei (.ogg, .wav, .mp3, .m4a)\n    language:   Sprache (Standard: 'de' für Deutsch)\n\nReturns:\n    Transkribierter Text oder Fehlermeldung.",
+      "input_schema": {
+        "properties": {
+          "audio_file": {
+            "title": "Audio File",
+            "type": "string"
+          },
+          "language": {
+            "default": "de",
+            "title": "Language",
+            "type": "string"
+          }
+        },
+        "required": [
+          "audio_file"
+        ],
+        "title": "transcribeArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "voice",
+      "name": "voice__speak",
+      "bare_name": "speak",
+      "description": "Synthetisiert Text zu einer Sprachdatei via Piper TTS.\n\nArgs:\n    text:        Zu sprechender Text (Deutsch)\n    output_file: Ausgabepfad (.wav); leer = automatischer Pfad in output/\n    voice:       Piper-Stimme (leer = Standard de_DE-thorsten-medium)\n\nReturns:\n    Pfad zur erzeugten WAV-Datei oder Fehlermeldung.",
+      "input_schema": {
+        "properties": {
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "output_file": {
+            "default": "",
+            "title": "Output File",
+            "type": "string"
+          },
+          "voice": {
+            "default": "",
+            "title": "Voice",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "speakArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "hook",
+      "name": "hook__n8n_trigger",
+      "bare_name": "n8n_trigger",
+      "description": "Sendet einen HTTP-POST an einen n8n/Make/Zapier-Webhook.\n\nArgs:\n    webhook_url: Vollständige Webhook-URL (https://...)\n    payload_json: JSON-String mit dem Payload (Default: {})\n    timeout: Timeout in Sekunden (Default: 15)\n\nReturns:\n    HTTP-Status + Response-Body (gekürzt auf 500 Zeichen).",
+      "input_schema": {
+        "properties": {
+          "webhook_url": {
+            "title": "Webhook Url",
+            "type": "string"
+          },
+          "payload_json": {
+            "default": "{}",
+            "title": "Payload Json",
+            "type": "string"
+          },
+          "timeout": {
+            "default": 15,
+            "title": "Timeout",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "webhook_url"
+        ],
+        "title": "n8n_triggerArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "hook",
+      "name": "hook__webhook_call",
+      "bare_name": "webhook_call",
+      "description": "Generischer HTTP-Aufruf (GET/POST/PUT) an einen Webhook oder REST-Endpoint.\n\nArgs:\n    url: Ziel-URL\n    method: HTTP-Methode (GET, POST, PUT, PATCH) — Default POST\n    payload_json: Request-Body als JSON-String (für POST/PUT)\n    headers_json: Zusätzliche HTTP-Header als JSON-String\n    timeout: Timeout in Sekunden\n\nReturns:\n    HTTP-Status + Response-Body.",
+      "input_schema": {
+        "properties": {
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "method": {
+            "default": "POST",
+            "title": "Method",
+            "type": "string"
+          },
+          "payload_json": {
+            "default": "{}",
+            "title": "Payload Json",
+            "type": "string"
+          },
+          "headers_json": {
+            "default": "{}",
+            "title": "Headers Json",
+            "type": "string"
+          },
+          "timeout": {
+            "default": 15,
+            "title": "Timeout",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "webhook_callArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "office",
+      "name": "office__create_docx",
+      "bare_name": "create_docx",
+      "description": "Erstellt ein Word-Dokument (.docx) aus Titel und Markdown-Inhalt.\n\nArgs:\n    title: Dokumenttitel (wird als H1-Überschrift eingefügt)\n    content: Inhalt als Markdown (# H1, ## H2, - Liste, normaler Text)\n    output_file: Zieldatei-Pfad (leer = automatisch in output/)\n\nReturns:\n    Pfad zur erstellten .docx-Datei.",
+      "input_schema": {
+        "properties": {
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "output_file": {
+            "default": "",
+            "title": "Output File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "content"
+        ],
+        "title": "create_docxArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "office",
+      "name": "office__read_docx",
+      "bare_name": "read_docx",
+      "description": "Liest ein Word-Dokument (.docx) und gibt den Text als Markdown zurück.\n\nArgs:\n    file_path: Pfad zur .docx-Datei\n\nReturns:\n    Dokumentinhalt als Text.",
+      "input_schema": {
+        "properties": {
+          "file_path": {
+            "title": "File Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file_path"
+        ],
+        "title": "read_docxArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "office",
+      "name": "office__create_pptx",
+      "bare_name": "create_pptx",
+      "description": "Erstellt eine PowerPoint-Präsentation (.pptx).\n\nArgs:\n    title: Präsentationstitel (Titelfolie)\n    slides_json: JSON-Array mit Folien: [{\"title\":\"...\", \"content\":\"Bullet1\\nBullet2\"}]\n    output_file: Zieldatei-Pfad (leer = automatisch in output/)\n\nReturns:\n    Pfad zur erstellten .pptx-Datei.",
+      "input_schema": {
+        "properties": {
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "slides_json": {
+            "title": "Slides Json",
+            "type": "string"
+          },
+          "output_file": {
+            "default": "",
+            "title": "Output File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "slides_json"
+        ],
+        "title": "create_pptxArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "office",
+      "name": "office__read_pptx",
+      "bare_name": "read_pptx",
+      "description": "Liest eine PowerPoint-Datei und gibt Text je Folie zurück.\n\nArgs:\n    file_path: Pfad zur .pptx-Datei\n\nReturns:\n    Text aller Folien, durchnummeriert.",
+      "input_schema": {
+        "properties": {
+          "file_path": {
+            "title": "File Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file_path"
+        ],
+        "title": "read_pptxArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "office",
+      "name": "office__create_xlsx",
+      "bare_name": "create_xlsx",
+      "description": "Erstellt eine Excel-Datei (.xlsx) aus JSON-Daten.\n\nArgs:\n    data_json: JSON-Array — entweder Liste von Dicts (Schlüssel=Spalten) oder\n               Liste von Listen (erste Zeile = Header). Beispiel:\n               '[{\"Name\":\"Max\",\"Wert\":42},{\"Name\":\"Eva\",\"Wert\":99}]'\n    output_file: Zieldatei-Pfad (leer = automatisch in output/)\n    sheet_name: Name des Arbeitsblatts (Default: Tabelle1)\n\nReturns:\n    Pfad zur erstellten .xlsx-Datei.",
+      "input_schema": {
+        "properties": {
+          "data_json": {
+            "title": "Data Json",
+            "type": "string"
+          },
+          "output_file": {
+            "default": "",
+            "title": "Output File",
+            "type": "string"
+          },
+          "sheet_name": {
+            "default": "Tabelle1",
+            "title": "Sheet Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "data_json"
+        ],
+        "title": "create_xlsxArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "office",
+      "name": "office__read_xlsx",
+      "bare_name": "read_xlsx",
+      "description": "Liest eine Excel-Datei und gibt den Inhalt als CSV-ähnlichen Text zurück.\n\nArgs:\n    file_path: Pfad zur .xlsx-Datei\n    sheet_name: Name des Arbeitsblatts (leer = erstes Blatt)\n\nReturns:\n    Tabelleninhalt als Tabulator-getrennte Zeilen (erste Zeile = Header).",
+      "input_schema": {
+        "properties": {
+          "file_path": {
+            "title": "File Path",
+            "type": "string"
+          },
+          "sheet_name": {
+            "default": "",
+            "title": "Sheet Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file_path"
+        ],
+        "title": "read_xlsxArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "quiz",
+      "name": "quiz__quiz_start",
+      "bare_name": "quiz_start",
+      "description": "Startet eine neue Quiz-Session zum angegebenen Thema.\nSucht Kontext in der Wissensbasis (kb_search) und generiert Fragen per LLM.\n\ntopic       = Lernthema, z.B. 'Stahlerzeugung', 'EGFR-Inhibitoren', 'Python async'\nn_questions = Anzahl Fragen (1–10, Standard 5)\ncollection  = Wissensbasis-Collection (uni / tech / learnings)\n\nGibt Session-ID + erste Frage zurück.",
+      "input_schema": {
+        "properties": {
+          "topic": {
+            "title": "Topic",
+            "type": "string"
+          },
+          "n_questions": {
+            "default": 5,
+            "title": "N Questions",
+            "type": "integer"
+          },
+          "collection": {
+            "default": "uni",
+            "title": "Collection",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "title": "quiz_startArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "quiz",
+      "name": "quiz__quiz_answer",
+      "bare_name": "quiz_answer",
+      "description": "Beantwortet die aktuelle Frage einer laufenden Quiz-Session.\n\nsession_id = ID aus quiz_start\nanswer     = Antwort (bei MC: 'A'/'B'/'C'/'D', bei offen: Freitext)\n\nGibt Bewertung + nächste Frage (oder Abschlussbericht) zurück.",
+      "input_schema": {
+        "properties": {
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "answer": {
+            "title": "Answer",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "answer"
+        ],
+        "title": "quiz_answerArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "quiz",
+      "name": "quiz__quiz_stats",
+      "bare_name": "quiz_stats",
+      "description": "Zeigt Fehlerquoten und Schwachstellen-Analyse je Thema.\nGut fuer: herausfinden, welche Bereiche wiederholt werden sollten.\n\ntopic = Filter (leer = alle Themen)",
+      "input_schema": {
+        "properties": {
+          "topic": {
+            "default": "",
+            "title": "Topic",
+            "type": "string"
+          }
+        },
+        "title": "quiz_statsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "quiz",
+      "name": "quiz__quiz_topics",
+      "bare_name": "quiz_topics",
+      "description": "Listet alle Themen auf, die bisher im Quiz bearbeitet wurden, mit Statistik.",
+      "input_schema": {
+        "properties": {},
+        "title": "quiz_topicsArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "github",
+      "name": "github__get_issue",
+      "bare_name": "get_issue",
+      "description": "Holt Titel, Body und Labels eines GitHub-Issues.\n\nArgs:\n    owner_repo: 'owner/repo', z.B. 'meinname/meinprojekt'\n    number:     Issue-Nummer (z.B. 4)\n\nReturns:\n    Formatierter Issue-Text mit Titel, Labels, Body.",
+      "input_schema": {
+        "properties": {
+          "owner_repo": {
+            "title": "Owner Repo",
+            "type": "string"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "owner_repo",
+          "number"
+        ],
+        "title": "get_issueArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "github",
+      "name": "github__list_issues",
+      "bare_name": "list_issues",
+      "description": "Listet Issues eines Repos auf.\n\nArgs:\n    owner_repo: 'owner/repo'\n    state:      'open', 'closed' oder 'all' (Standard: 'open')\n    limit:      Maximale Anzahl (Standard: 20)\n\nReturns:\n    Tabellarische Liste mit Nummer, Titel, Labels.",
+      "input_schema": {
+        "properties": {
+          "owner_repo": {
+            "title": "Owner Repo",
+            "type": "string"
+          },
+          "state": {
+            "default": "open",
+            "title": "State",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "owner_repo"
+        ],
+        "title": "list_issuesArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "github",
+      "name": "github__clone_or_pull",
+      "bare_name": "clone_or_pull",
+      "description": "Clont ein Repo oder aktualisiert es (git pull), falls es schon da ist.\n\nArgs:\n    owner_repo: 'owner/repo'\n    local_dir:  Lokaler Pfad (leer = automatisch n:\\allinall\\repos\\<repo>)\n\nReturns:\n    Lokaler Pfad des Repos oder Fehlermeldung.",
+      "input_schema": {
+        "properties": {
+          "owner_repo": {
+            "title": "Owner Repo",
+            "type": "string"
+          },
+          "local_dir": {
+            "default": "",
+            "title": "Local Dir",
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner_repo"
+        ],
+        "title": "clone_or_pullArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "github",
+      "name": "github__create_branch",
+      "bare_name": "create_branch",
+      "description": "Legt einen neuen Branch an (von aktuellem HEAD, z.B. main).\n\nKEIN Push — Branch ist nur lokal bis commit_push aufgerufen wird.\n\nArgs:\n    local_path:  Absoluter Pfad zum geclonten Repo\n    branch_name: z.B. 'fix/issue-4'\n\nReturns:\n    Bestätigung oder Fehlermeldung.",
+      "input_schema": {
+        "properties": {
+          "local_path": {
+            "title": "Local Path",
+            "type": "string"
+          },
+          "branch_name": {
+            "title": "Branch Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "local_path",
+          "branch_name"
+        ],
+        "title": "create_branchArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "github",
+      "name": "github__commit_push",
+      "bare_name": "commit_push",
+      "description": "Stagt alle Änderungen, committet und pusht den Branch.\n\nSicherheit: Kein force-push. Push nur auf den angegebenen Branch,\nniemals auf main/master/develop/production.\n\nArgs:\n    local_path: Absoluter Pfad zum geclonten Repo\n    branch:     Branch-Name (muss mit create_branch angelegt worden sein)\n    message:    Commit-Nachricht\n\nReturns:\n    Bestätigung mit Push-Ausgabe oder Fehlermeldung.",
+      "input_schema": {
+        "properties": {
+          "local_path": {
+            "title": "Local Path",
+            "type": "string"
+          },
+          "branch": {
+            "title": "Branch",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "local_path",
+          "branch",
+          "message"
+        ],
+        "title": "commit_pushArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "github",
+      "name": "github__create_pr",
+      "bare_name": "create_pr",
+      "description": "Öffnet einen Pull Request. IMMER hinter V6-Gate — zuerst mail.confirm_action aufrufen!\n\nNutzungsregel (PFLICHT):\n  1. Erst `mail.confirm_action(action='github_pr', ...)` — wartet auf GO.\n  2. Erst nach GO dieses Tool aufrufen.\n\nArgs:\n    owner_repo: 'owner/repo'\n    branch:     Feature-Branch (nicht main/master)\n    title:      PR-Titel\n    body:       PR-Beschreibung (Markdown)\n    base:       Ziel-Branch (Standard: 'main')\n\nReturns:\n    PR-URL oder Fehlermeldung.",
+      "input_schema": {
+        "properties": {
+          "owner_repo": {
+            "title": "Owner Repo",
+            "type": "string"
+          },
+          "branch": {
+            "title": "Branch",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "base": {
+            "default": "main",
+            "title": "Base",
+            "type": "string"
+          }
+        },
+        "required": [
+          "owner_repo",
+          "branch",
+          "title",
+          "body"
+        ],
+        "title": "create_prArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "jobs",
+      "name": "jobs__job_submit",
+      "bare_name": "job_submit",
+      "description": "Reicht einen neuen Hintergrund-Job ein (gibt sofort eine Job-ID zurück).\n\nFür: Langläufer die den Chat nicht blockieren sollen (deep-research,\nbuild-bot, factory). Der eigentliche Auftrag wird später als eigenständiger\nAgent-Turn gestartet.\n\ndescription: Was soll getan werden? (klarer Auftrag, 1-3 Sätze)\npriority:    1 = höchste, 10 = niedrigste (Standard: 5)\n\nReturns: Job-ID + Hinweis wie der Job verfolgt werden kann.",
+      "input_schema": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "priority": {
+            "default": 5,
+            "title": "Priority",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "description"
+        ],
+        "title": "job_submitArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "jobs",
+      "name": "jobs__job_start",
+      "bare_name": "job_start",
+      "description": "Markiert einen Job als 'running' (aufgerufen vom Agent, der ihn bearbeitet).\n\njob_id: vollständige Job-ID oder eindeutiger Anfang (mind. 4 Zeichen)",
+      "input_schema": {
+        "properties": {
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "title": "job_startArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "jobs",
+      "name": "jobs__job_complete",
+      "bare_name": "job_complete",
+      "description": "Speichert das Ergebnis eines Jobs und markiert ihn als 'done'.\nSendet optional eine Telegram-Benachrichtigung.\n\njob_id: vollständige Job-ID oder eindeutiger Anfang\nresult: Ergebnis-Text (Zusammenfassung, Pfad, URL, ...)",
+      "input_schema": {
+        "properties": {
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "result"
+        ],
+        "title": "job_completeArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "jobs",
+      "name": "jobs__job_fail",
+      "bare_name": "job_fail",
+      "description": "Markiert einen Job als fehlgeschlagen und speichert den Grund.\n\njob_id: vollständige Job-ID oder eindeutiger Anfang\nreason: Fehlerbeschreibung",
+      "input_schema": {
+        "properties": {
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "reason"
+        ],
+        "title": "job_failArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "jobs",
+      "name": "jobs__job_cancel",
+      "bare_name": "job_cancel",
+      "description": "Bricht einen pending oder running Job ab.\n\njob_id: vollständige Job-ID oder eindeutiger Anfang",
+      "input_schema": {
+        "properties": {
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "title": "job_cancelArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "jobs",
+      "name": "jobs__job_status",
+      "bare_name": "job_status",
+      "description": "Status und Ergebnis eines einzelnen Jobs.\n\njob_id: vollständige Job-ID oder eindeutiger Anfang (mind. 4 Zeichen)",
+      "input_schema": {
+        "properties": {
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "title": "job_statusArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "jobs",
+      "name": "jobs__job_list",
+      "bare_name": "job_list",
+      "description": "Listet Jobs nach Status auf.\n\nstate: 'active' (pending+running, Standard) | 'pending' | 'running' |\n       'done' | 'failed' | 'cancelled' | 'all'\n\nFür: Überblick über laufende und wartende Aufgaben.",
+      "input_schema": {
+        "properties": {
+          "state": {
+            "default": "active",
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "title": "job_listArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "jobs",
+      "name": "jobs__auto_research_quota",
+      "bare_name": "auto_research_quota",
+      "description": "I4 Neugier-Schleife: Tages-Kontingent für automatische Hintergrundrecherchen.\n\nSchützt vor Endlosschleifen: maximal 3 Auto-Jobs pro Tag.\nAuto-Jobs sind Jobs, deren Beschreibung mit '[AUTO]' beginnt.\n\nPrüfe dieses Kontingent VOR jedem job_submit('[AUTO] ...') —\nnur wenn 'Kapazität frei' zurückkommt, Job einreichen.\n\nGibt zurück: Verbrauch heute, Limit, ob weiterer Job erlaubt ist.",
+      "input_schema": {
+        "properties": {},
+        "title": "auto_research_quotaArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "profile",
+      "name": "profile__profile_list",
+      "bare_name": "profile_list",
+      "description": "Listet alle verfuegbaren Tool-Profile mit Beschreibungen und Deny-Groesse.\n\nProfile bestimmen, welche MCP-Tools dem Modell angeboten werden.\nKleineres Profil = kleinere Angriffsflaeche.",
+      "input_schema": {
+        "properties": {},
+        "title": "profile_listArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "profile",
+      "name": "profile__profile_get",
+      "bare_name": "profile_get",
+      "description": "Gibt das aktuell aktive Tool-Profil zurueck (aus active_profile.json).\n\nDas Profil bestimmt, welche Tools dem Modell sichtbar sind.\nEffektiv wird es erst nach einem Gateway-Neustart erzwungen.",
+      "input_schema": {
+        "properties": {},
+        "title": "profile_getArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "profile",
+      "name": "profile__profile_set",
+      "bare_name": "profile_set",
+      "description": "Setzt ein Tool-Profil: schreibt tools.deny in openclaw.json + active_profile.json.\n\nname: eines von full | coding | research | comms | vision | minimal\n\nACHTUNG: Die Tool-Einschraenkung wird erst nach einem Gateway-Neustart\nerzwungen (OpenClaw liest config beim Start). Bis dahin ist das Profil\nals 'pending restart' vermerkt.",
+      "input_schema": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "profile_setArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "profile",
+      "name": "profile__profile_diff",
+      "bare_name": "profile_diff",
+      "description": "Zeigt, welche Tools sich zwischen zwei Profilen unterscheiden.\n\nprofile_a, profile_b: Profilnamen (z.B. 'coding', 'research')\n\nNuetzlich um zu verstehen, was ein Profilwechsel freischaltet/sperrt.",
+      "input_schema": {
+        "properties": {
+          "profile_a": {
+            "title": "Profile A",
+            "type": "string"
+          },
+          "profile_b": {
+            "title": "Profile B",
+            "type": "string"
+          }
+        },
+        "required": [
+          "profile_a",
+          "profile_b"
+        ],
+        "title": "profile_diffArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "screenshot",
+      "name": "screenshot__screenshot_take",
+      "bare_name": "screenshot_take",
+      "description": "Nimmt einen Screenshot des Desktops auf und speichert ihn als PNG.\n\noutput_path:  Wo die Datei gespeichert wird.\n              Leer = automatischer Zeitstempel unter output/screenshots/.\nregion_xywh:  Optionaler Ausschnitt: 'x,y,breite,hoehe' (Pixel).\n              Leer = gesamter Desktop (alle Monitore).\n\nGibt den absoluten Dateipfad zurueck — direkt an vision_describe() oder\nllm__vision_describe() weitergeben fuer die Bildanalyse.\n\nWICHTIG: Lesen = ungated. Dieser Tool nimmt NUR auf, er handelt nicht.",
+      "input_schema": {
+        "properties": {
+          "output_path": {
+            "default": "",
+            "title": "Output Path",
+            "type": "string"
+          },
+          "region_xywh": {
+            "default": "",
+            "title": "Region Xywh",
+            "type": "string"
+          }
+        },
+        "title": "screenshot_takeArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "screenshot",
+      "name": "screenshot__vision_pipeline",
+      "bare_name": "vision_pipeline",
+      "description": "Screenshot + Beschreibung in einem Schritt (Read-then-act Vorstufe fuer Phase C).\n\nNimmt einen Screenshot und analysiert ihn sofort mit dem Vision-Modell\n(qwen3-vl lokal → Gemini-Flash Cloud als Fallback).\n\nquestion:          Was soll das Modell am Bild analysieren/beantworten?\nregion_xywh:       Bildschirmbereich 'x,y,w,h' oder leer fuer alles.\nsave_screenshot:   True = Datei behalten, False = nach Analyse loeschen.\n\nTypische Fragen:\n  - 'Was steht im Fenster oben rechts?'\n  - 'Ist ein Fehlerdialog sichtbar? Beschreibe ihn genau.'\n  - 'Welche Schaltflaechen sind klickbar?'\n\nLESEN: ungated. Dieser Tool schreibt/klickt NICHTS — nur Beobachtung.",
+      "input_schema": {
+        "properties": {
+          "question": {
+            "default": "Was ist auf diesem Bildschirm? Beschreibe genau.",
+            "title": "Question",
+            "type": "string"
+          },
+          "region_xywh": {
+            "default": "",
+            "title": "Region Xywh",
+            "type": "string"
+          },
+          "save_screenshot": {
+            "default": true,
+            "title": "Save Screenshot",
+            "type": "boolean"
+          }
+        },
+        "title": "vision_pipelineArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__browser_open",
+      "bare_name": "browser_open",
+      "description": "Browser öffnen und URL laden — UNGATED (nur Beobachtung, keine Aktion).\n\nÖffnet ein eigenes, sauberes Chromium-Profil (keine gespeicherten Passwörter,\nkein Sync, kein Haupt-Browser). Domain-Allowlist wird geprüft.\n\nurl:      Ziel-URL (muss in Domain-Allowlist sein)\nheadless: False = sichtbares Fenster (Standard); True = Hintergrund\n\nNach dem Öffnen: browser_screenshot() zum Sehen, browser_dom_tree() zum Lesen.",
+      "input_schema": {
+        "properties": {
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "headless": {
+            "default": false,
+            "title": "Headless",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "browser_openArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__browser_navigate",
+      "bare_name": "browser_navigate",
+      "description": "In bestehendem Tab zu einer URL navigieren — UNGATED.\n\nDomain-Allowlist wird geprüft. Für Links auf der Seite folgen oder\ndirekt zu einer bekannten URL gehen.",
+      "input_schema": {
+        "properties": {
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "browser_navigateArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__browser_screenshot",
+      "bare_name": "browser_screenshot",
+      "description": "Screenshot der aktuellen Browser-Seite — UNGATED.\n\nGibt den Pfad zur PNG-Datei zurück.\nWeiterverarbeitung: llm__vision_describe(image_path='<pfad>', question='...')",
+      "input_schema": {
+        "properties": {},
+        "title": "browser_screenshotArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__browser_dom_tree",
+      "bare_name": "browser_dom_tree",
+      "description": "Accessibility-Tree der aktuellen Seite — UNGATED.\n\nZeigt interaktive Elemente strukturiert (Rollen, Namen, Werte).\nIdeal um den richtigen Selektor für browser_click / browser_type zu finden.\n\nSelektor-Konventionen für Folge-Calls:\n  text=Schaltfläche       → nach sichtbarem Text\n  role=button name=OK     → nach Rolle + Name\n  label=E-Mail            → nach Form-Label\n  placeholder=Suche       → nach Placeholder\n  #mein-id                → CSS-Selektor",
+      "input_schema": {
+        "properties": {},
+        "title": "browser_dom_treeArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__browser_get_text",
+      "bare_name": "browser_get_text",
+      "description": "Sichtbarer Text der aktuellen Seite — UNGATED.\n\nFür Inhalt-Extraktion ohne Vision-Modell. Max 4000 Zeichen.",
+      "input_schema": {
+        "properties": {},
+        "title": "browser_get_textArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__browser_get_url",
+      "bare_name": "browser_get_url",
+      "description": "Aktuelle URL und Seitentitel — UNGATED.",
+      "input_schema": {
+        "properties": {},
+        "title": "browser_get_urlArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__browser_find_element",
+      "bare_name": "browser_find_element",
+      "description": "Element auf der Seite suchen (ohne zu klicken) — UNGATED.\n\nquery-Format:\n  text=Schaltfläche       → nach sichtbarem Text\n  role=button name=OK     → nach Rolle + Name\n  label=E-Mail            → nach Form-Label\n  placeholder=Suche       → nach Placeholder\n  #id / .klasse           → CSS-Selektor\n\nGibt sichtbare Elemente zurück — für browser_click / browser_type.",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "browser_find_elementArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__browser_close",
+      "bare_name": "browser_close",
+      "description": "Browser schliessen und Ressourcen freigeben — UNGATED.",
+      "input_schema": {
+        "properties": {},
+        "title": "browser_closeArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__browser_list_pending",
+      "bare_name": "browser_list_pending",
+      "description": "Offene Browser-GO-Gates anzeigen — UNGATED.",
+      "input_schema": {
+        "properties": {},
+        "title": "browser_list_pendingArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__browser_cancel_action",
+      "bare_name": "browser_cancel_action",
+      "description": "Browser-Gate abbrechen — UNGATED.",
+      "input_schema": {
+        "properties": {
+          "gate_id": {
+            "title": "Gate Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "gate_id"
+        ],
+        "title": "browser_cancel_actionArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__domain_allowlist_list",
+      "bare_name": "domain_allowlist_list",
+      "description": "Aktuell freigegebene Browser-Domains anzeigen — UNGATED.",
+      "input_schema": {
+        "properties": {},
+        "title": "domain_allowlist_listArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__domain_allowlist_add",
+      "bare_name": "domain_allowlist_add",
+      "description": "Domain zur Browser-Allowlist hinzufügen — UNGATED (Konfiguration).\n\ndomain: z.B. 'example.com' (Subdomains werden automatisch miterfasst)",
+      "input_schema": {
+        "properties": {
+          "domain": {
+            "title": "Domain",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "title": "domain_allowlist_addArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__browser_click",
+      "bare_name": "browser_click",
+      "description": "Element klicken — GO-GATE (normale Genehmigung).\n\nLegt PENDING-Gate an. Erst nach 'GO <gate_id>' wird geklickt.\nKein TOTP erforderlich (normales Gate).\n\ntarget: CSS-Selektor oder text=.../role=.../label=.../placeholder=...\n\nWorkflow:\n  1. browser_click(\"text=Anmelden\")  → PENDING abc123\n  2. User: GO abc123\n  3. browser__browser_confirm_action(gate_id=\"abc123\") → Klick ausgeführt",
+      "input_schema": {
+        "properties": {
+          "target": {
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target"
+        ],
+        "title": "browser_clickArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__browser_type",
+      "bare_name": "browser_type",
+      "description": "Text in Eingabefeld eintippen — SCHARF (GO + TOTP).\n\nLegt PENDING-Gate mit TOTP-Pflicht an.\nACHTUNG: Passwörter NIE über den Agenten eintippen lassen.\n\ntarget: Selektor (label=..., placeholder=..., #id, ...)\ntext:   Einzugebender Text\n\nWorkflow:\n  1. browser_type(target=\"label=E-Mail\", text=\"user@example.com\") → PENDING abc123 [SCHARF]\n  2. User: GO abc123 123456\n  3. browser__browser_confirm_action(gate_id=\"abc123\", totp_code=\"123456\")",
+      "input_schema": {
+        "properties": {
+          "target": {
+            "title": "Target",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target",
+          "text"
+        ],
+        "title": "browser_typeArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__browser_submit",
+      "bare_name": "browser_submit",
+      "description": "Formular/Schaltfläche absenden — SCHÄRFSTES Gate (GO + TOTP).\n\nJede Submit-Aktion kann externen Zustand ändern (Datenbankeinträge,\nE-Mails, Bestellungen). Daher schärfste Gate-Klasse.\n\ntarget: Submit-Button-Selektor (leer = Enter auf aktiver Eingabe)\n\nWorkflow:\n  1. browser_submit(target=\"role=button name=Absenden\") → PENDING abc123 [SCHARF]\n  2. User: GO abc123 123456\n  3. browser__browser_confirm_action(gate_id=\"abc123\", totp_code=\"123456\")",
+      "input_schema": {
+        "properties": {
+          "target": {
+            "default": "",
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "title": "browser_submitArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "browser",
+      "name": "browser__browser_confirm_action",
+      "bare_name": "browser_confirm_action",
+      "description": "Genehmigt ein Browser-Gate und führt die Aktion aus.\n\nNormale Gates:  browser_confirm_action(gate_id=\"abc123\")\nTOTP-Gates:     browser_confirm_action(gate_id=\"abc123\", totp_code=\"123456\")\n\nTOTP-Code aus der Authenticator-App (Secret: YUFQ6UNCAXTI4XQSGTSVXCHFIEBRXDR2).",
+      "input_schema": {
+        "properties": {
+          "gate_id": {
+            "title": "Gate Id",
+            "type": "string"
+          },
+          "totp_code": {
+            "default": "",
+            "title": "Totp Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "gate_id"
+        ],
+        "title": "browser_confirm_actionArguments",
+        "type": "object"
+      }
+    }
+  ]
+}
