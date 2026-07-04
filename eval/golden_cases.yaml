@@ -139,3 +139,9 @@ cases:
   - id: g26-backup-natural
     prompt: "Bitte sichere die Matrix, ich will ein aktuelles Backup haben."
     expect_tool: "assistant__backup_now"
+
+  # ── LLM-as-a-Judge: semantische Qualität, die Regex nicht prüfen kann ──
+  - id: g27-judge-explain
+    prompt: "Erkläre einem völligen Anfänger in 3 bis 5 Sätzen, warum regelmäßige Backups wichtig sind."
+    expect_no_cloud: true
+    expect_judge: "Antwort ist auf Deutsch, hat etwa 3-5 Sätze, erklärt verständlich ohne Fachjargon mindestens einen konkreten Grund für Backups (z.B. Datenverlust durch Defekt/Versehen), enthält keine falschen Aussagen."

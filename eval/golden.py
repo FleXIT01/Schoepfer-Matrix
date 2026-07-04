@@ -121,6 +121,47 @@ def _chat(system: str, user: str, tools: list[dict]) -> tuple[list[str], str, st
     return names, args, content, elapsed, ""
 
 
+# ─── LLM-as-a-Judge (V24) ─────────────────────────────────────────────────────
+# Für Antworten, die Regex nicht fair prüfen kann (Stil, Verständlichkeit,
+# inhaltliche Qualität). Gleiches lokales Modell, OHNE Tools, temp 0 + Seed
+# → so deterministisch wie der Rest der Suite. Urteil: erste Zeile PASS/FAIL.
+
+def _judge(criteria: str, question: str, answer: str) -> tuple[bool, str]:
+    if not answer.strip():
+        return False, "keine Textantwort zu bewerten"
+    payload = {
+        "model": MODEL,
+        "stream": False,
+        "options": {"temperature": 0, "num_ctx": NUM_CTX, "seed": SEED,
+                    "num_predict": 900},
+        "messages": [
+            {"role": "system", "content":
+                "Du bist ein strenger, fairer Qualitätsprüfer. Bewerte, ob die "
+                "ANTWORT die KRITERIEN erfüllt. Deine Ausgabe: ERSTE Zeile exakt "
+                "PASS oder FAIL, zweite Zeile eine kurze Begründung (max 15 Wörter)."},
+            {"role": "user", "content":
+                f"FRAGE:\n{question}\n\nANTWORT:\n{answer}\n\nKRITERIEN:\n{criteria}"},
+        ],
+    }
+    data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(f"{OLLAMA}/api/chat", data=data,
+                                 headers={"Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=PER_CASE_TIMEOUT) as r:
+            resp = json.loads(r.read().decode("utf-8"))
+    except Exception as e:  # noqa: BLE001
+        return False, f"Judge-Fehler: {type(e).__name__}"
+    msg = resp.get("message", {}) or {}
+    # gpt-oss (Reasoning): Urteil kann in content ODER thinking stehen.
+    text = (msg.get("content") or "") + "\n" + (msg.get("thinking") or "")
+    m = re.search(r"\b(PASS|FAIL)\b", text)
+    if not m:
+        return False, "Judge lieferte kein PASS/FAIL"
+    verdict = m.group(1) == "PASS"
+    reason = " ".join(text[m.end():].strip().splitlines()[:1])[:80] if text[m.end():].strip() else ""
+    return verdict, reason or ("erfüllt" if verdict else "nicht erfüllt")
+
+
 # ─── Checks ───────────────────────────────────────────────────────────────────
 
 def _eval_case(case: dict, names: list[str], args: str, content: str) -> tuple[bool, list[str]]:
@@ -157,6 +198,11 @@ def _eval_case(case: dict, names: list[str], args: str, content: str) -> tuple[b
     if case.get("expect_direct"):
         hit = len(names) == 0
         notes.append(f"direct {'✓' if hit else '✗ (rief: ' + ', '.join(names) + ')'}")
+        checks.append(hit)
+
+    if "expect_judge" in case:
+        hit, reason = _judge(case["expect_judge"], case.get("prompt", ""), content)
+        notes.append(f"judge {'✓' if hit else '✗'} ({reason})")
         checks.append(hit)
 
     if not checks:

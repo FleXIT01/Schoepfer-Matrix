@@ -1,0 +1,56 @@
+"""<NAME>_mcp — MCP-Server für die <API-NAME>-API (generiert via Skill api-integrate).
+
+Tools: <tool_a>, <tool_b>
+Auth:  API-Key aus Umgebungsvariable <NAME>_API_KEY (via secrets.env → openclaw.json).
+Start (stdio): python server.py
+"""
+from __future__ import annotations
+
+import json
+import os
+import ssl
+
+import httpx
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("<name>")
+
+BASE_URL = "<https://api.example.com/v1>"
+API_KEY = os.environ.get("<NAME>_API_KEY", "")
+
+# Windows/Antivirus-MITM (Avast & Co.): Windows-Zertifikatspruefung statt certifi.
+_SSL_CTX = ssl.create_default_context()
+_SSL_CTX.verify_flags &= ~ssl.VERIFY_X509_STRICT
+
+_MAX_CHARS = 2000  # Antworten kuerzen — Modellkontext schonen
+
+
+def _get(path: str, params: dict | None = None) -> dict | str:
+    """GET-Helfer mit Auth, Timeout und sauberer Fehlermeldung."""
+    headers = {"User-Agent": "Schoepfer-Matrix/1.0"}
+    if API_KEY:
+        headers["Authorization"] = f"Bearer {API_KEY}"
+    try:
+        r = httpx.get(f"{BASE_URL}{path}", params=params or {},
+                      headers=headers, timeout=30, verify=_SSL_CTX)
+        r.raise_for_status()
+        return r.json()
+    except httpx.HTTPStatusError as e:
+        return f"[<name>] HTTP {e.response.status_code}: {e.response.text[:200]}"
+    except Exception as e:  # noqa: BLE001
+        return f"[<name>] Fehler: {type(e).__name__}: {e}"
+
+
+@mcp.tool()
+def <tool_a>(query: str, limit: int = 5) -> str:
+    """<Deutsche Beschreibung — WICHTIG: Trigger-Formulierungen nennen,
+    z.B. 'Suche nach X in <API-NAME>', damit das Routing greift.>"""
+    data = _get("/<endpoint>", {"q": query, "limit": limit})
+    if isinstance(data, str):
+        return data  # Fehlertext durchreichen
+    out = json.dumps(data, ensure_ascii=False, indent=1)
+    return out[:_MAX_CHARS] + ("…[gekürzt]" if len(out) > _MAX_CHARS else "")
+
+
+if __name__ == "__main__":
+    mcp.run(transport="stdio")

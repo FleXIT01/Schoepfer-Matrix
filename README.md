@@ -90,13 +90,17 @@ Alle Skripte sind **portabel**: kein Pfad ist hartkodiert, der Repo-Ordner darf
 
 | Aktion | Befehl |
 |---|---|
-| Alles starten | `gateway.cmd` |
-| Alles stoppen | **Strg+C** im Gateway-Fenster oder `stop.cmd` |
-| Gesamtstatus (Dienste, VRAM, Tasks, Backup-Alter, Eval) | `status.cmd` |
+| Alles starten | `gateway.cmd` oder `python matrix.py up` |
+| Alles stoppen | **Strg+C** im Gateway-Fenster, `stop.cmd` oder `python matrix.py stop` |
+| Gesamtstatus (Dienste, VRAM, Tasks, Backup-Alter, Eval) | `status.cmd` / `matrix.py status` |
 | Autostart beim PC-Boot an/aus | `autostart.cmd on` / `off` |
-| Sofort-Backup | `/backup` im Chat oder Doppelklick `backup.cmd` |
-| Eval-Suite gegen Baseline | `run_eval.cmd` |
-| Tool-Kontextbudget messen / Profile | `eval\tool_budget.py` · `eval\tool_profile.py` |
+| Sofort-Backup | `/backup` im Chat oder `matrix.py backup` |
+| Eval-Suite gegen Baseline | `run_eval.cmd` / `matrix.py eval` |
+| Logs / Tool-Kontextbudget | `matrix.py logs` · `matrix.py budget` |
+
+`matrix.py` ist das zentrale CLI (`up/stop/status/eval/backup/briefing/retro/budget/logs`)
+— es delegiert an die getesteten Skripte. Architektur-Entscheidungen und geplante
+Erweiterungen: **[ROADMAP.md](ROADMAP.md)**.
 
 ## Projektstruktur
 
@@ -110,7 +114,8 @@ Alle Skripte sind **portabel**: kein Pfad ist hartkodiert, der Repo-Ordner darf
 ├─ briefing.py / retro.py / mail_poll.py   Morgenbriefing, Wochen-Retro, Mail-Eingang
 ├─ mcp-servers/                     24 MCP-Server (Python, FastMCP)
 ├─ eval/                            Golden-Suite, Tool-Budget, Profile, Kataloge
-├─ openclaw-workspace/agent-workspace/   AGENTS.md (Werkzeug-Routing) + 19 Skills
+├─ matrix.py                        zentrales CLI (up/stop/status/eval/…)
+├─ openclaw-workspace/agent-workspace/   AGENTS.md (Werkzeug-Routing) + 21 Skills
 └─ openclaw-main/                   OpenClaw (separat installieren, nicht im Repo)
 ```
 

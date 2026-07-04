@@ -1,5 +1,5 @@
 {
-  "saved": "20260704-115915",
+  "saved": "20260704-172333",
   "model": "gpt-oss-32k",
   "cases": {
     "g01-route-code": {
@@ -125,7 +125,7 @@
     "g21-profile": {
       "status": "pass",
       "tools": [
-        "profile__profile_list"
+        "profile__profile_get"
       ]
     },
     "g22-research-pdf-send": {
@@ -153,6 +153,10 @@
       "tools": [
         "assistant__backup_now"
       ]
+    },
+    "g27-judge-explain": {
+      "status": "pass",
+      "tools": []
     }
   }
 }
