@@ -350,30 +350,381 @@ def download_file(url: str, dest_dir: str, filename: str = "") -> str:
 
 
 @mcp.tool()
-def run_command(command: str, workdir: str = "") -> str:
-    """Führt einen Shell-Befehl (PowerShell/CMD) lokal aus und gibt stdout+stderr
-    zurück (max 8000 Zeichen). `command` = der Befehl, `workdir` = optionales
-    Arbeitsverzeichnis. Timeout: 120s. VORSICHT: Nur für sichere Befehle nutzen."""
+def _resolve_shell(shell: str) -> tuple[str, str]:
+    """Gibt (kind, exe) zurueck; kind in {'ps','cmd'}.
+    'auto'/'pwsh'/'powershell' -> PowerShell (pwsh 7 bevorzugt, sonst 5.1),
+    'cmd' -> cmd.exe. So laeuft es unabhaengig von der installierten Version."""
+    import shutil
+    s = (shell or "auto").lower().strip()
+    if s == "cmd":
+        return "cmd", (shutil.which("cmd") or "cmd")
+    if s == "powershell":  # explizit Windows PowerShell 5.1 erzwingen
+        return "ps", (shutil.which("powershell") or "powershell")
+    # auto/pwsh: PowerShell 7 (pwsh) bevorzugen, sonst 5.1
+    return "ps", (shutil.which("pwsh") or shutil.which("powershell") or "powershell")
+
+
+def _decode_bytes(b: bytes) -> str:
+    """Robuste Dekodierung von Shell-Ausgabe: UTF-16 (PS-5.1-Dateiredirect schreibt
+    so!), UTF-8, sonst OEM-Codepage cp850 (deutsche Konsole/native Tools wie ping)."""
+    if not b:
+        return ""
+    if b[:2] in (b"\xff\xfe", b"\xfe\xff"):
+        return b.decode("utf-16", errors="replace")
+    if b[:3] == b"\xef\xbb\xbf":
+        return b.decode("utf-8-sig", errors="replace")
+    try:
+        return b.decode("utf-8")
+    except UnicodeDecodeError:
+        return b.decode("cp850", errors="replace")
+
+
+def _needs_elevation(text: str) -> bool:
+    t = text.lower()
+    return any(n in t for n in (
+        "access is denied", "zugriff verweigert", "zugriff wurde verweigert",
+        "der zugriff auf den pfad", "requires elevation", "erfordert erhöhte",
+        "unauthorizedaccess", "permission denied",
+        "run as administrator", "als administrator", "ausreichende berechtigung"))
+
+
+def _run_elevated(kind: str, exe: str, command: str, cwd: str | None, timeout: int) -> str:
+    """Fuehrt `command` mit Adminrechten aus (einmalige UAC-Bestaetigung) und faengt
+    die Ausgabe ueber eine Temp-Datei ab. Start-Process -Verb RunAs kann NICHT direkt
+    umgeleitet werden (UseShellExecute), darum: Befehl -> Skriptdatei, der ERHOEHTE
+    Prozess leitet selbst in die Datei um, wir lesen sie danach zurueck."""
+    import subprocess as sp
+    import tempfile
+    import uuid
+
+    d = Path(tempfile.gettempdir())
+    tag = uuid.uuid4().hex[:8]
+    out_file = d / f"matrix_elev_{tag}.out"
+    script = d / (f"matrix_elev_{tag}.bat" if kind == "cmd" else f"matrix_elev_{tag}.ps1")
+    launcher = d / f"matrix_elev_{tag}_launch.ps1"
+    try:
+        if kind == "cmd":
+            script.write_text(
+                "@echo off\r\n" + (f'cd /d "{cwd}"\r\n' if cwd else "") + command + "\r\n",
+                encoding="utf-8")
+            arglist = f"@('/d','/c','\"{script}\" > \"{out_file}\" 2>&1')"
+        else:
+            script.write_text(
+                (f"Set-Location -LiteralPath '{cwd}'\r\n" if cwd else "") + command + "\r\n",
+                encoding="utf-8-sig")  # BOM -> auch PS 5.1 liest die Datei als UTF-8
+            arglist = (f"@('-NoProfile','-ExecutionPolicy','Bypass','-Command',"
+                       f"\"& '{script}' *> '{out_file}'\")")
+        launcher.write_text(
+            "$ErrorActionPreference='Stop'\r\n"
+            "try {\r\n"
+            f"  $p = Start-Process -FilePath \"{exe}\" -ArgumentList {arglist} "
+            "-Verb RunAs -Wait -PassThru -WindowStyle Hidden\r\n"
+            "  exit $p.ExitCode\r\n"
+            "} catch {\r\n"
+            f"  [IO.File]::WriteAllText('{out_file}', 'ELEVATION_ABGELEHNT: ' + $_.Exception.Message)\r\n"
+            "  exit 1223\r\n"
+            "}\r\n", encoding="utf-8")
+        r = sp.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
+                    "-File", str(launcher)], capture_output=True, timeout=timeout)
+        code = r.returncode
+        out = _decode_bytes(out_file.read_bytes()).strip() if out_file.exists() else ""
+        if code == 1223 or out.startswith("ELEVATION_ABGELEHNT"):
+            return "[Fehler: Elevation abgelehnt (UAC verneint/abgebrochen).]"
+        if len(out) > 8000:
+            out = out[:8000] + "\n…[gekuerzt]"
+        return f"[ExitCode={code}] via {Path(exe).stem} (elevated)\n{out or 'keine Ausgabe'}"
+    except sp.TimeoutExpired:
+        return f"[Fehler: Zeitueberschreitung ({timeout}s) — UAC evtl. nicht bestaetigt.]"
+    except Exception as e:
+        return f"[Fehler (elevated): {e}]"
+    finally:
+        for f in (script, launcher, out_file):
+            try:
+                f.unlink()
+            except Exception:
+                pass
+
+
+def _run_background(kind: str, command: str, cwd: str | None,
+                    elevated: bool, notify: bool) -> str:
+    """Startet `command` DETACHED (kein Warten) und kehrt sofort zurueck — fuer lange
+    Laeufer (sfc, dism, chkdsk, Backups), die den 60-s-MCP-Timeout sprengen wuerden.
+    Ausgabe geht in eine Logdatei; ist notify=True, schickt der Hintergrundprozess das
+    Ergebnis selbst per Telegram, wenn er fertig ist (autonom, ohne dass der Turn wartet).
+    elevated=True -> einmalige UAC-Bestaetigung, danach laeuft es erhoeht weiter."""
+    import subprocess as sp
+    import tempfile
+    import uuid
+
+    root = Path(__file__).resolve().parents[2]
+    logdir = root / "openclaw-workspace" / "output"
+    try:
+        logdir.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        logdir = Path(tempfile.gettempdir())
+    d = Path(tempfile.gettempdir())
+    tag = uuid.uuid4().hex[:8]
+    log = logdir / f"cmd_{tag}.log"
+    wrapper = d / f"matrix_bg_{tag}.ps1"
+
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "") if notify else ""
+    chat = os.environ.get("TELEGRAM_DEFAULT_CHAT_ID", "").strip() if notify else ""
+
+    # Kindskript mit dem eigentlichen Befehl (bat fuer cmd, ps1 sonst)
+    if kind == "cmd":
+        child = d / f"matrix_bg_{tag}.bat"
+        child.write_text("@echo off\r\n" + (f'cd /d "{cwd}"\r\n' if cwd else "")
+                         + command + "\r\n", encoding="utf-8")
+        invoke = f"& cmd.exe /d /c '{child}'"
+    else:
+        child = d / f"matrix_bg_{tag}_cmd.ps1"
+        child.write_text((f"Set-Location -LiteralPath '{cwd}'\r\n" if cwd else "")
+                         + command + "\r\n", encoding="utf-8-sig")
+        invoke = f"& '{child}'"
+
+    # Telegram-Meldung am Ende (PowerShell/Invoke-RestMethod nutzt Windows-Cert-Store
+    # -> Avast-CA bekannt, anders als Python ohne truststore)
+    notify_block = ""
+    if token and chat:
+        notify_block = (
+            "try {\r\n"
+            "  $tail = ''\r\n"
+            "  if (Test-Path -LiteralPath $log) { $tail = (Get-Content -LiteralPath $log -Tail 25) -join \"`n\" }\r\n"
+            "  if ($tail.Length -gt 3000) { $tail = '…' + $tail.Substring($tail.Length-3000) }\r\n"
+            f"  $b = @{{ chat_id='{chat}'; text=(\"✅ Hintergrund-Befehl fertig (ExitCode \" + $code + \"):`n`n\" + $tail) }} | ConvertTo-Json -Compress\r\n"
+            f"  Invoke-RestMethod -Uri 'https://api.telegram.org/bot{token}/sendMessage' -Method Post -Body $b -ContentType 'application/json; charset=utf-8' -TimeoutSec 25 | Out-Null\r\n"
+            "} catch {}\r\n")
+
+    wrapper.write_text(
+        "$ErrorActionPreference='Continue'\r\n"
+        f"$log = '{log}'\r\n"
+        f"{invoke} *> $log\r\n"
+        "$code = $LASTEXITCODE\r\n"
+        + notify_block +
+        f"Remove-Item -LiteralPath '{child}' -Force -ErrorAction SilentlyContinue\r\n"
+        "Remove-Item -LiteralPath $PSCommandPath -Force -ErrorAction SilentlyContinue\r\n",
+        encoding="utf-8")
+
+    ps_args = ("'-NoProfile','-ExecutionPolicy','Bypass','-WindowStyle','Hidden',"
+               f"'-File','{wrapper}'")
+    verb = " -Verb RunAs" if elevated else ""
+    launch = (f"$ErrorActionPreference='Stop'; try {{ Start-Process -FilePath 'powershell' "
+              f"-ArgumentList {ps_args} -WindowStyle Hidden{verb} | Out-Null; exit 0 }} "
+              "catch { exit 1223 }")
+    try:
+        r = sp.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", launch],
+                   capture_output=True, timeout=90)
+    except sp.TimeoutExpired:
+        return "[Fehler: Start abgebrochen — UAC evtl. nicht bestaetigt (90s).]"
+    except Exception as e:
+        return f"[Fehler (background): {e}]"
+    if r.returncode == 1223:
+        return "[Fehler: Elevation abgelehnt (UAC verneint/abgebrochen).]"
+
+    short = (command.strip().splitlines() or [""])[0][:70]
+    tail = ("\nErgebnis kommt automatisch per Telegram, wenn fertig."
+            if (token and chat) else
+            f"\nFortschritt pruefen: Get-Content '{log}' -Tail 30")
+    return (f"[Hintergrund gestartet{' · elevated' if elevated else ''}] {short}\n"
+            f"Log: {log}{tail}")
+
+
+@mcp.tool()
+def run_command(command: str, workdir: str = "", shell: str = "auto",
+                elevated: bool = False, timeout: int = 120,
+                background: bool = False, notify: bool = True) -> str:
+    """Fuehrt einen Shell-Befehl lokal aus und gibt stdout+stderr zurueck (max 20000 Z.).
+    Laeuft UNABHAENGIG von der PowerShell-Version und wahlweise mit Adminrechten.
+
+    `command`  = der Befehl (ein- oder mehrzeilig).
+    `workdir`  = optionales Arbeitsverzeichnis.
+    `shell`    = 'auto' (PowerShell; nimmt pwsh 7 wenn vorhanden, sonst 5.1) |
+                 'powershell' (erzwingt Windows PowerShell 5.1) | 'pwsh' (PS 7) |
+                 'cmd' (klassische Eingabeaufforderung, fuer .bat/dir/copy/net use etc.).
+    `elevated` = True -> mit Adminrechten (einmalige UAC-Bestaetigung AM PC durch den
+                 Nutzer — per Fernsteuerung/Telegram kann niemand klicken!). Fuer
+                 Dienste, geschuetzte Pfade, Netzwerkkonfig, Treiber, sc/netsh/reg.
+    `timeout`  = Sekunden (5..600, Standard 120) — nur fuer den NORMALEN (wartenden) Lauf.
+    `background` = True -> Befehl DETACHED starten, sofort zurueckkehren. PFLICHT fuer
+                 lange Laeufer (sfc /scannow, dism, chkdsk, grosse Kopien) — die sprengen
+                 sonst den 60-s-MCP-Timeout ('Request timed out'). Ausgabe geht in ein Log;
+                 bei notify=True schickt der Prozess das Ergebnis selbst per Telegram, wenn
+                 er fertig ist. Mit elevated kombinierbar (eine UAC-Bestaetigung).
+    `notify`   = (nur bei background) True -> Ergebnis am Ende per Telegram melden.
+
+    NETZWERK-SCANS NICHT hier: dafuer `net_scan` nutzen (schnell, ohne Timeout).
+    Bei 'Zugriff verweigert' -> denselben Befehl mit elevated=True erneut aufrufen.
+    'sfc /scannow' & Co. IMMER mit background=True (+elevated=True) starten.
+    VORSICHT: Nur fuer sichere Befehle; irreversibles vorher bestaetigen lassen."""
     import subprocess as sp
 
     cwd = workdir.strip() if workdir else None
     if cwd and not Path(cwd).is_dir():
         return f"[Fehler: Verzeichnis '{cwd}' existiert nicht.]"
     try:
-        result = sp.run(
-            ["powershell", "-NoProfile", "-Command", command],
-            capture_output=True, text=True, timeout=120, cwd=cwd,
-        )
-        out = (result.stdout or "") + (result.stderr or "")
-        out = out.strip()
-        if len(out) > 8000:
-            out = out[:8000] + "\n…[gekürzt]"
-        code = result.returncode
-        return f"[ExitCode={code}]\n{out}" if out else f"[ExitCode={code}, keine Ausgabe]"
+        timeout = max(5, min(int(timeout or 120), 600))
+    except (TypeError, ValueError):
+        timeout = 120
+    kind, exe = _resolve_shell(shell)
+
+    if background:
+        return _run_background(kind, command, cwd, elevated, notify)
+    if elevated:
+        return _run_elevated(kind, exe, command, cwd, timeout)
+
+    if kind == "cmd":
+        argv = [exe, "/d", "/c", command]
+    else:
+        argv = [exe, "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", command]
+    try:
+        result = sp.run(argv, capture_output=True, timeout=timeout, cwd=cwd)
     except sp.TimeoutExpired:
-        return "[Fehler: Zeitüberschreitung (120s).]"
+        return f"[Fehler: Zeitueberschreitung ({timeout}s).]"
+    except FileNotFoundError:
+        return f"[Fehler: Shell '{exe}' nicht gefunden.]"
     except Exception as e:
         return f"[Fehler: {e}]"
+
+    out = (_decode_bytes(result.stdout) + _decode_bytes(result.stderr)).strip()
+    code = result.returncode
+    hint = ""
+    if code != 0 and _needs_elevation(out):
+        hint = ("\n[Hinweis: Adminrechte fehlen — denselben Befehl mit elevated=True "
+                "erneut aufrufen (einmalige UAC-Bestaetigung).]")
+    if len(out) > 20000:
+        out = out[:20000] + "\n…[gekuerzt]"
+    tail = f" via {Path(exe).stem}"
+    return f"[ExitCode={code}]{tail}\n{out}{hint}" if out else \
+           f"[ExitCode={code}]{tail}, keine Ausgabe{hint}"
+
+
+_STD_PORTS = [21, 22, 23, 25, 53, 80, 110, 139, 143, 443, 445, 3389, 8080]
+
+
+def _local_subnet() -> tuple[str, str]:
+    """Ermittelt die primaere IPv4 und das /24-Praefix ('192.168.1') des eigenen PCs."""
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))  # kein Traffic — nur Routing-Entscheidung
+        ip = s.getsockname()[0]
+    except Exception:
+        ip = "127.0.0.1"
+    finally:
+        s.close()
+    return ip, ip.rsplit(".", 1)[0]
+
+
+def _ping(host: str, timeout_ms: int = 500) -> bool:
+    """Ein ICMP-Ping via Windows-ping (kein Admin noetig). Liest BYTES —
+    deutsches ping gibt OEM-Codepage aus (0x81 u.a.), text=True wuerde unter
+    PYTHONUTF8 im Reader-Thread crashen. 'TTL='/'ttl=' im Rohbyte-Puffer =
+    echte Antwort (returncode allein ist unter Windows unzuverlaessig)."""
+    import subprocess as sp
+    try:
+        r = sp.run(["ping", "-n", "1", "-w", str(timeout_ms), host],
+                   capture_output=True, timeout=timeout_ms / 1000 + 2)
+        return b"ttl=" in (r.stdout or b"").lower()
+    except Exception:
+        return False
+
+
+def _port_open(host: str, port: int, timeout: float = 0.4) -> bool:
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(timeout)
+    try:
+        return s.connect_ex((host, port)) == 0
+    finally:
+        s.close()
+
+
+@mcp.tool()
+def net_scan(target: str = "", ports: str = "", max_hosts: int = 254) -> str:
+    """Schneller Netzwerk-Scan (Ping-Sweep + Port-Scan) — nebenlaeufig, ohne nmap,
+    ohne Admin-Rechte, PowerShell-unabhaengig. NUTZE DIESES TOOL fuer jede Anfrage
+    'mach einen Ping-/Port-Scan', 'scanne mein Netzwerk', 'welche Geraete/offenen Ports'.
+    Schreibe NICHT selbst PowerShell-Scan-Skripte (Test-Connection/Test-NetConnection
+    sind zu langsam und laufen in den Timeout).
+
+    `target`: leer = EIGENES lokales /24-Subnetz (Standard); eine IP/Host (z.B.
+              '192.168.1.10' oder 'meinserver.local') = nur dieses Ziel; ein Praefix
+              wie '10.0.0' = dieses /24.
+    `ports` : leer = Standard-Ports (21,22,23,25,53,80,110,139,143,443,445,3389,8080);
+              sonst kommagetrennt (z.B. '80,443,8080') oder Bereich '1-1024'.
+    `max_hosts`: Sicherheitsdeckel fuer die Host-Zahl beim Subnetz-Scan.
+
+    Gibt eine kompakte Zusammenfassung (erreichbare Hosts + offene Ports je Host)
+    zurueck — direkt fuer eine PDF/Antwort verwendbar."""
+    import concurrent.futures as cf
+    import ipaddress
+
+    # ── Ports parsen ──────────────────────────────────────────────────────────
+    plist: list[int] = []
+    if ports.strip():
+        for part in ports.replace(" ", "").split(","):
+            if "-" in part:
+                a, b = part.split("-", 1)
+                if a.isdigit() and b.isdigit():
+                    plist.extend(range(int(a), min(int(b), 65535) + 1))
+            elif part.isdigit():
+                plist.append(int(part))
+        plist = sorted(set(p for p in plist if 0 < p <= 65535))[:1024]
+    if not plist:
+        plist = list(_STD_PORTS)
+
+    # ── Zielhosts bestimmen ───────────────────────────────────────────────────
+    own_ip, own_pref = _local_subnet()
+    t = target.strip()
+    scope = ""
+    if not t:
+        prefix = own_pref
+        hosts = [f"{prefix}.{i}" for i in range(1, 255)][:max_hosts]
+        scope = f"eigenes Subnetz {prefix}.0/24 (eigene IP {own_ip})"
+    else:
+        # Einzelnes /24-Praefix wie '10.0.0'
+        if t.count(".") == 2 and all(o.isdigit() for o in t.split(".")):
+            hosts = [f"{t}.{i}" for i in range(1, 255)][:max_hosts]
+            scope = f"Subnetz {t}.0/24"
+        else:
+            # Einzel-IP oder Hostname
+            try:
+                ipaddress.ip_address(t)
+            except ValueError:
+                pass  # Hostname ist ok
+            hosts = [t]
+            scope = f"Host {t}"
+
+    # ── Ping-Sweep (nur bei mehr als einem Host; Einzelziel wird direkt gescannt) ─
+    if len(hosts) > 1:
+        with cf.ThreadPoolExecutor(max_workers=128) as ex:
+            alive = [h for h, ok in zip(hosts, ex.map(_ping, hosts)) if ok]
+    else:
+        alive = hosts
+
+    if not alive:
+        return (f"[net_scan] {scope}: kein Host geantwortet (Ping). "
+                f"Moeglich: Geraete blocken ICMP, oder falsches Subnetz. "
+                f"Eigene IP ist {own_ip} — ggf. target='{own_pref}' explizit angeben.")
+
+    # ── Port-Scan der erreichbaren Hosts (nebenlaeufig) ───────────────────────
+    tasks = [(h, p) for h in alive for p in plist]
+    open_map: dict[str, list[int]] = {h: [] for h in alive}
+    with cf.ThreadPoolExecutor(max_workers=256) as ex:
+        results = ex.map(lambda hp: (hp[0], hp[1], _port_open(hp[0], hp[1])), tasks)
+        for h, p, is_open in results:
+            if is_open:
+                open_map[h].append(p)
+
+    # ── Bericht ───────────────────────────────────────────────────────────────
+    lines = [f"Netzwerk-Scan — {scope}",
+             f"Erreichbare Hosts (Ping): {len(alive)} von {len(hosts)} geprueft",
+             f"Gepruefte Ports: {', '.join(map(str, plist)) if len(plist) <= 20 else str(len(plist)) + ' Ports'}",
+             ""]
+    for h in sorted(alive, key=lambda x: [int(o) if o.isdigit() else o for o in x.split(".")]):
+        op = open_map.get(h, [])
+        lines.append(f"  {h:<16} offene Ports: {', '.join(map(str, op)) if op else 'keine'}")
+    return "\n".join(lines)
 
 
 @mcp.tool()

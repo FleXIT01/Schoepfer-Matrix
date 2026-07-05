@@ -1,8 +1,8 @@
 {
-  "generated": "2026-07-04T19:22:22",
+  "generated": "2026-07-05T13:38:17",
   "servers_ok": 24,
   "servers_total": 24,
-  "active_tools": 129,
+  "active_tools": 131,
   "tools": [
     {
       "server": "science",
@@ -775,7 +775,7 @@
       "server": "llm",
       "name": "llm__council",
       "bare_name": "council",
-      "description": "Rat der Modelle: lokal (gpt-oss:20b) + cloud_cheap (DeepSeek) antworten UNABHAENGIG;\nein Richter fasst zusammen und markiert Widersprueche EXPLIZIT als Liste.\nKillt Single-Model-Blindspots bei wichtigen Entscheidungen.\nKosten: 1 DeepSeek-Call (Centbereich) + optionaler Richter-Cloud-Call.\n`prompt` = die Frage/Aufgabe.\n`judge`  = 'local' (gpt-oss, Default) | 'cloud' (Claude Opus, teurer, fuer kritische Entscheidungen).\nTrigger: 'wichtige Entscheidung', 'Zweitmeinung', 'sicher gehen', 'vergleiche Antworten'.",
+      "description": "Rat der Modelle: lokal (gpt-oss:20b) + cloud_cheap (DeepSeek) antworten UNABHAENGIG;\nein Richter fasst zusammen und markiert Widersprueche EXPLIZIT als Liste.\nKillt Single-Model-Blindspots bei wichtigen Entscheidungen.\nBeide Raete + Richter sehen einen Live-Systemzustand (CPU/GPU/VRAM/geladene Modelle) —\nEmpfehlungen zu Batch-Groessen, Modellwahl oder Performance beruhen auf ECHTEN Zahlen.\nKosten: 1 DeepSeek-Call (Centbereich) + optionaler Richter-Cloud-Call.\n`prompt` = die Frage/Aufgabe.\n`judge`  = 'local' (gpt-oss, Default) | 'cloud' (Claude Opus, teurer, fuer kritische Entscheidungen).\nTrigger: 'wichtige Entscheidung', 'Zweitmeinung', 'sicher gehen', 'vergleiche Antworten'.",
       "input_schema": {
         "properties": {
           "prompt": {
@@ -1549,9 +1549,28 @@
     },
     {
       "server": "assistant",
+      "name": "assistant___resolve_shell",
+      "bare_name": "_resolve_shell",
+      "description": "Gibt (kind, exe) zurueck; kind in {'ps','cmd'}.\n'auto'/'pwsh'/'powershell' -> PowerShell (pwsh 7 bevorzugt, sonst 5.1),\n'cmd' -> cmd.exe. So laeuft es unabhaengig von der installierten Version.",
+      "input_schema": {
+        "properties": {
+          "shell": {
+            "title": "Shell",
+            "type": "string"
+          }
+        },
+        "required": [
+          "shell"
+        ],
+        "title": "_resolve_shellArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "assistant",
       "name": "assistant__run_command",
       "bare_name": "run_command",
-      "description": "Führt einen Shell-Befehl (PowerShell/CMD) lokal aus und gibt stdout+stderr\nzurück (max 8000 Zeichen). `command` = der Befehl, `workdir` = optionales\nArbeitsverzeichnis. Timeout: 120s. VORSICHT: Nur für sichere Befehle nutzen.",
+      "description": "Fuehrt einen Shell-Befehl lokal aus und gibt stdout+stderr zurueck (max 20000 Z.).\nLaeuft UNABHAENGIG von der PowerShell-Version und wahlweise mit Adminrechten.\n\n`command`  = der Befehl (ein- oder mehrzeilig).\n`workdir`  = optionales Arbeitsverzeichnis.\n`shell`    = 'auto' (PowerShell; nimmt pwsh 7 wenn vorhanden, sonst 5.1) |\n             'powershell' (erzwingt Windows PowerShell 5.1) | 'pwsh' (PS 7) |\n             'cmd' (klassische Eingabeaufforderung, fuer .bat/dir/copy/net use etc.).\n`elevated` = True -> mit Adminrechten (einmalige UAC-Bestaetigung AM PC durch den\n             Nutzer — per Fernsteuerung/Telegram kann niemand klicken!). Fuer\n             Dienste, geschuetzte Pfade, Netzwerkkonfig, Treiber, sc/netsh/reg.\n`timeout`  = Sekunden (5..600, Standard 120) — nur fuer den NORMALEN (wartenden) Lauf.\n`background` = True -> Befehl DETACHED starten, sofort zurueckkehren. PFLICHT fuer\n             lange Laeufer (sfc /scannow, dism, chkdsk, grosse Kopien) — die sprengen\n             sonst den 60-s-MCP-Timeout ('Request timed out'). Ausgabe geht in ein Log;\n             bei notify=True schickt der Prozess das Ergebnis selbst per Telegram, wenn\n             er fertig ist. Mit elevated kombinierbar (eine UAC-Bestaetigung).\n`notify`   = (nur bei background) True -> Ergebnis am Ende per Telegram melden.\n\nNETZWERK-SCANS NICHT hier: dafuer `net_scan` nutzen (schnell, ohne Timeout).\nBei 'Zugriff verweigert' -> denselben Befehl mit elevated=True erneut aufrufen.\n'sfc /scannow' & Co. IMMER mit background=True (+elevated=True) starten.\nVORSICHT: Nur fuer sichere Befehle; irreversibles vorher bestaetigen lassen.",
       "input_schema": {
         "properties": {
           "command": {
@@ -1562,12 +1581,64 @@
             "default": "",
             "title": "Workdir",
             "type": "string"
+          },
+          "shell": {
+            "default": "auto",
+            "title": "Shell",
+            "type": "string"
+          },
+          "elevated": {
+            "default": false,
+            "title": "Elevated",
+            "type": "boolean"
+          },
+          "timeout": {
+            "default": 120,
+            "title": "Timeout",
+            "type": "integer"
+          },
+          "background": {
+            "default": false,
+            "title": "Background",
+            "type": "boolean"
+          },
+          "notify": {
+            "default": true,
+            "title": "Notify",
+            "type": "boolean"
           }
         },
         "required": [
           "command"
         ],
         "title": "run_commandArguments",
+        "type": "object"
+      }
+    },
+    {
+      "server": "assistant",
+      "name": "assistant__net_scan",
+      "bare_name": "net_scan",
+      "description": "Schneller Netzwerk-Scan (Ping-Sweep + Port-Scan) — nebenlaeufig, ohne nmap,\nohne Admin-Rechte, PowerShell-unabhaengig. NUTZE DIESES TOOL fuer jede Anfrage\n'mach einen Ping-/Port-Scan', 'scanne mein Netzwerk', 'welche Geraete/offenen Ports'.\nSchreibe NICHT selbst PowerShell-Scan-Skripte (Test-Connection/Test-NetConnection\nsind zu langsam und laufen in den Timeout).\n\n`target`: leer = EIGENES lokales /24-Subnetz (Standard); eine IP/Host (z.B.\n          '192.168.1.10' oder 'meinserver.local') = nur dieses Ziel; ein Praefix\n          wie '10.0.0' = dieses /24.\n`ports` : leer = Standard-Ports (21,22,23,25,53,80,110,139,143,443,445,3389,8080);\n          sonst kommagetrennt (z.B. '80,443,8080') oder Bereich '1-1024'.\n`max_hosts`: Sicherheitsdeckel fuer die Host-Zahl beim Subnetz-Scan.\n\nGibt eine kompakte Zusammenfassung (erreichbare Hosts + offene Ports je Host)\nzurueck — direkt fuer eine PDF/Antwort verwendbar.",
+      "input_schema": {
+        "properties": {
+          "target": {
+            "default": "",
+            "title": "Target",
+            "type": "string"
+          },
+          "ports": {
+            "default": "",
+            "title": "Ports",
+            "type": "string"
+          },
+          "max_hosts": {
+            "default": 254,
+            "title": "Max Hosts",
+            "type": "integer"
+          }
+        },
+        "title": "net_scanArguments",
         "type": "object"
       }
     },

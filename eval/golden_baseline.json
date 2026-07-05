@@ -1,5 +1,5 @@
 {
-  "saved": "20260704-222737",
+  "saved": "20260705-114032",
   "model": "gpt-oss-32k",
   "cases": {
     "g01-route-code": {
@@ -41,7 +41,7 @@
     "g07-can-load": {
       "status": "pass",
       "tools": [
-        "planner__get_resources"
+        "planner__can_load"
       ]
     },
     "g08-view-trace": {
@@ -107,7 +107,7 @@
     "g18-screenshot": {
       "status": "pass",
       "tools": [
-        "planner__can_load"
+        "screenshot__screenshot_take"
       ]
     },
     "g19-telegram": {
@@ -125,7 +125,7 @@
     "g21-profile": {
       "status": "pass",
       "tools": [
-        "profile__profile_list"
+        "profile__profile_get"
       ]
     },
     "g22-research-pdf-send": {
@@ -161,7 +161,13 @@
     "g28-eigenes-netz-kein-refusal": {
       "status": "pass",
       "tools": [
-        "assistant__run_command"
+        "assistant__net_scan"
+      ]
+    },
+    "g29-net-scan": {
+      "status": "pass",
+      "tools": [
+        "assistant__net_scan"
       ]
     }
   }

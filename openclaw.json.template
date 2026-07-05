@@ -131,6 +131,7 @@
         }
       },
       "assistant": {
+          "requestTimeoutMs": 300000,
         "command": "C:/Python314/python.exe",
         "args": [
           "n:/allinall/mcp-servers/assistant_mcp/server.py"

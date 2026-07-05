@@ -153,3 +153,10 @@ cases:
     expect_any: true
     expect_tool: "assistant__run_command|pdf__pdf_create|research__.*|assistant__research_pdf_send"
     expect_no_refusal: true
+
+  # ── Netzwerk-Scan: dediziertes Tool statt fehleranfälliger PowerShell-Skripte
+  #    (Ping/Port-Scan via net_scan; sonst Timeout + non_deliverable-Turn)
+  - id: g29-net-scan
+    prompt: "Mach einen Ping- und Port-Scan von meinem Netzwerk."
+    expect_tool: "assistant__net_scan"
+    expect_no_refusal: true
