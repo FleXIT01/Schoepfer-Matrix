@@ -105,6 +105,33 @@ Alle Skripte sind **portabel**: kein Pfad ist hartkodiert, der Repo-Ordner darf
 — es delegiert an die getesteten Skripte. Architektur-Entscheidungen und geplante
 Erweiterungen: **[ROADMAP.md](ROADMAP.md)**.
 
+## Webhook (n8n / HTTP)
+
+`webhook_server.py` ist ein FastAPI-Eingang (Port 7890) für Automatisierungen wie n8n:
+
+| Endpoint | Beschreibung |
+|---|---|
+| `GET /health` | Status-Check |
+| `POST /run` | Startet einen Agent-Turn, gibt das Ergebnis als JSON zurück |
+| `POST /run/async` | Startet den Turn im Hintergrund, gibt eine `job_id` zurück |
+
+```bash
+# 1) Token in secrets.env eintragen (PFLICHT — ohne Token verweigert der Server den Start):
+MATRIX_WEBHOOK_TOKEN=<langer-zufallsstring>
+
+# 2) Starten:
+python webhook_server.py
+
+# 3) Aus n8n (HTTP-Request-Node):
+#    POST http://127.0.0.1:7890/run
+#    Headers: Authorization: Bearer <token>
+#    Body: {"prompt": "Fasse EGFR-Inhibitoren als PDF zusammen und schick es"}
+```
+
+Der Server lauscht standardmäßig auf `127.0.0.1` (nur lokal). Prompts werden gegen
+eine Zeichenzulassliste geprüft — CMD-Metazeichen (`;`, `|`, `&`, `%`, …) werden mit
+einem 400-Fehler abgelehnt.
+
 ## Projektstruktur
 
 ```

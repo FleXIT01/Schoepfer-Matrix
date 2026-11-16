@@ -27,6 +27,8 @@ install.cmd
 :: 2) secrets.env ausfüllen (mindestens):
 ::    TELEGRAM_BOT_TOKEN       (@BotFather -> /newbot)
 ::    TELEGRAM_DEFAULT_CHAT_ID (@userinfobot fragen)
+::    Optional fuer Webhook/n8n (webhook_server.py, Port 7890):
+::    MATRIX_WEBHOOK_TOKEN     (langer Zufallsstring — PFLICHT, kein Default)
 
 :: 3) Starten:
 gateway.cmd
@@ -51,6 +53,7 @@ nachgeholt).
 | Sofort-Backup | `/backup` im Telegram-Chat oder Task 02:30 |
 | Autostart beim PC-Boot an/aus | `autostart.cmd on` / `off` |
 | Eval-Suite manuell | `run_eval.cmd` (nachts automatisch) |
+| Webhook-Server (n8n/HTTP) | `python webhook_server.py` — Port 7890, braucht `MATRIX_WEBHOOK_TOKEN` aus `secrets.env` |
 | Sprachsteuerung (Push-to-Talk) | `voice.cmd` — F8 halten und sprechen (Gateway muss laufen) |
 
 ### Optional: Sprachsteuerung (Voice-PTT)
