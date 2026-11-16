@@ -23,7 +23,7 @@ import logging
 import sys
 from pathlib import Path
 
-# Projekt-Root (N:\allinall) und bot1 auf den Pfad setzen
+# Projekt-Root (Repository-Verzeichnis) und bot1 auf den Pfad setzen
 ALLINALL_ROOT = Path(__file__).resolve().parent
 BOT1_ROOT = ALLINALL_ROOT / "bot1"
 sys.path.insert(0, str(BOT1_ROOT))

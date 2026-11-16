@@ -5,7 +5,7 @@ import sys
 import sqlite3
 from pathlib import Path
 
-MCP = Path(r"n:\allinall\mcp-servers")
+MCP = Path(__file__).resolve().parent.parent / "mcp-servers"
 
 # ── G1/G2: Playbooks + Hygiene ──────────────────────────────────────────────────
 sys.path.insert(0, str(MCP / "kb_mcp"))

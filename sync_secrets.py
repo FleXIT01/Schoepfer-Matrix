@@ -4,8 +4,8 @@ V8 Secrets Hygiene: secrets.env ist die einzige Quelle der Wahrheit fuer
 API-Keys / Tokens. Dieses Skript synchronisiert sie nach openclaw.json.
 
 Aufruf:
-  python n:\\allinall\\sync_secrets.py           # patcht openclaw.json
-  python n:\\allinall\\sync_secrets.py --check   # prueft nur, zeigt Diff
+  python sync_secrets.py           # patcht openclaw.json
+  python sync_secrets.py --check   # prueft nur, zeigt Diff
 
 Wird automatisch von gateway.cmd beim Start aufgerufen.
 """

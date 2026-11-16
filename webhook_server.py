@@ -8,16 +8,19 @@ Endpoints:
   POST /run/async       → startet Turn im Hintergrund, gibt job_id zurueck (future)
 
 Nutzung aus n8n:
-  HTTP-Request-Node → POST http://<PC-IP>:7890/run
+  HTTP-Request-Node → POST http://127.0.0.1:7890/run
   Headers: Authorization: Bearer <token>
   Body: {"prompt": "Fasse EGFR-Inhibitoren als PDF zusammen und schick es"}
 
-Token: aus MATRIX_WEBHOOK_TOKEN (secrets.env) oder Default-Token.
+Token: PFLICHT aus MATRIX_WEBHOOK_TOKEN (secrets.env). Ohne Token verweigert
+der Server den Start — es gibt bewusst keinen Default-Token.
 """
 import os
+import re
 import subprocess
 import time
 import sys
+from pathlib import Path
 
 _FASTAPI_OK = False
 try:
@@ -30,14 +33,25 @@ except ImportError:
     pass
 
 
-TOKEN = os.environ.get("MATRIX_WEBHOOK_TOKEN", "schoepfer-matrix-webhook-2026")
-MATRIX_CMD = os.environ.get("MATRIX_CMD", r"n:\allinall\matrix.cmd")
-OPENCLAW_STATE_DIR = os.environ.get("OPENCLAW_STATE_DIR", "n:/allinall/openclaw-workspace/state")
+_ROOT = Path(__file__).resolve().parent
+
+TOKEN = os.environ.get("MATRIX_WEBHOOK_TOKEN", "").strip()
+MATRIX_CMD = os.environ.get("MATRIX_CMD", str(_ROOT / "matrix.cmd"))
+OPENCLAW_STATE_DIR = os.environ.get(
+    "OPENCLAW_STATE_DIR", str(_ROOT / "openclaw-workspace" / "state")
+)
 PORT = int(os.environ.get("WEBHOOK_PORT", "7890"))
+MAX_TIMEOUT_S = 600
 
 if not _FASTAPI_OK:
     print("[webhook_server] FEHLER: FastAPI/uvicorn nicht installiert.")
     print("  Bitte ausfuehren: pip install fastapi uvicorn")
+    sys.exit(1)
+
+if not TOKEN:
+    print("[webhook_server] FEHLER: MATRIX_WEBHOOK_TOKEN ist nicht gesetzt.")
+    print("  Bitte in secrets.env eintragen (beliebiger langer Zufallsstring).")
+    print("  Es gibt bewusst keinen Default-Token mehr.")
     sys.exit(1)
 
 app = FastAPI(title="Schoepfer-Matrix Webhook", version="1.0", docs_url=None, redoc_url=None)
@@ -45,9 +59,9 @@ bearer = HTTPBearer(auto_error=False)
 
 
 def _check_token(creds: HTTPAuthorizationCredentials = Depends(bearer)):
-    if TOKEN and (creds is None or creds.credentials != TOKEN):
+    if creds is None or creds.credentials != TOKEN:
         raise HTTPException(status_code=401, detail="Ungültiger oder fehlender Bearer-Token")
-    return creds.credentials if creds else ""
+    return creds.credentials
 
 
 class RunRequest(BaseModel):
@@ -61,15 +75,27 @@ def health():
     return {"status": "ok", "service": "schoepfer-matrix-webhook", "port": PORT}
 
 
+# Zeichenzulassliste fuer Prompts: verhindert CMD-Metazeichen (" ; | & < > % ^ ! `)
+# und damit CMD-Injection, statt sie nur zu ersetzen.
+_PROMPT_ALLOWED = re.compile(r"^[\w\s.,:!?+\-()/ '@#_=\[\]]+$", re.UNICODE)
+
+
 @app.post("/run")
 def run_turn(body: RunRequest, _: str = Depends(_check_token)):
     """Startet einen Agent-Turn via matrix.cmd und gibt das Ergebnis als JSON zurück."""
     prompt = body.prompt.strip()
     if not prompt:
         raise HTTPException(status_code=400, detail="'prompt' darf nicht leer sein")
+    if len(prompt) > 4000:
+        raise HTTPException(status_code=400, detail="'prompt' ist zu lang (max. 4000 Zeichen)")
+    if not _PROMPT_ALLOWED.match(prompt):
+        raise HTTPException(
+            status_code=400,
+            detail="'prompt' enthaelt nicht erlaubte Zeichen (CMD-Metazeichen sind blockiert)",
+        )
 
-    # Sicherheitsbereinigung: keine CMD-Injection durch Anführungszeichen im Prompt
-    prompt_safe = prompt.replace('"', "'").replace('\r', ' ')
+    prompt_safe = prompt
+    timeout_s = min(max(1, int(body.timeout)), MAX_TIMEOUT_S)
 
     env = {**os.environ, "OPENCLAW_STATE_DIR": OPENCLAW_STATE_DIR}
     t0 = time.time()
@@ -78,7 +104,7 @@ def run_turn(body: RunRequest, _: str = Depends(_check_token)):
             ["cmd", "/c", MATRIX_CMD, prompt_safe],
             capture_output=True,
             text=True,
-            timeout=body.timeout,
+            timeout=timeout_s,
             encoding="utf-8",
             errors="replace",
             env=env,
